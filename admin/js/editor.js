@@ -354,32 +354,73 @@ function wireResize(wrapper, handle, id) {
   });
 }
 
+const openDetailIds = new Set();
+
 function renderElementList() {
   elementList.innerHTML = "";
   for (const el of currentElements) {
+    const displayName = el.label || TYPE_LABELS[el.type] || el.type;
+
     const row = document.createElement("div");
     row.className = "element-row";
 
+    // --- Ligne principale : nom + visibilité + détails + suppr ---
+    const header = document.createElement("div");
+    header.className = "element-row__header";
+
     const name = document.createElement("div");
     name.className = "element-row__name";
-    name.textContent = el.label || TYPE_LABELS[el.type] || el.type;
-    row.appendChild(name);
+    name.textContent = displayName;
+    header.appendChild(name);
+
+    const btnVisible = document.createElement("button");
+    btnVisible.className = "icon-btn";
+    btnVisible.title = el.visible === false ? "Afficher" : "Masquer";
+    btnVisible.textContent = el.visible === false ? "◌" : "●";
+    btnVisible.addEventListener("click", () => toggleVisible(el.id));
+    header.appendChild(btnVisible);
+
+    const hasDetails = true; // taille + réglages spécifiques, toujours au moins la taille
+    let btnToggle;
+    if (hasDetails) {
+      btnToggle = document.createElement("button");
+      btnToggle.className = "icon-btn";
+      btnToggle.title = "Détails";
+      btnToggle.textContent = openDetailIds.has(el.id) ? "▾" : "▸";
+      header.appendChild(btnToggle);
+    }
+
+    const btnDelete = document.createElement("button");
+    btnDelete.className = "icon-btn icon-btn--danger";
+    btnDelete.title = "Supprimer";
+    btnDelete.textContent = "✕";
+    btnDelete.addEventListener("click", () => {
+      if (confirm(`Retirer "${displayName}" de la scène ?`)) removeElement(el.id);
+    });
+    header.appendChild(btnDelete);
+
+    row.appendChild(header);
+
+    // --- Détails repliables ---
+    const details = document.createElement("div");
+    details.className = "element-row__details";
+    details.style.display = openDetailIds.has(el.id) ? "flex" : "none";
 
     if (MULTI_INSTANCE_TYPES.has(el.type)) {
       const labelInput = document.createElement("input");
       labelInput.type = "text";
-      labelInput.placeholder = "nom (ex: Vote Giveaway)";
+      labelInput.placeholder = "nom affiché (ex: Vote Giveaway)";
       labelInput.value = el.label || "";
       labelInput.addEventListener("change", () => {
         el.label = labelInput.value.trim();
         persistElements();
         renderElementList();
       });
-      row.appendChild(labelInput);
+      details.appendChild(labelInput);
     }
 
-    const scaleWrap = document.createElement("div");
-    scaleWrap.className = "element-row__coords";
+    const scaleRow = document.createElement("div");
+    scaleRow.className = "detail-field";
     const scaleInput = document.createElement("input");
     scaleInput.type = "number";
     scaleInput.min = "0.2";
@@ -391,37 +432,24 @@ function renderElementList() {
       persistElements();
       renderCanvas();
     });
-    scaleWrap.appendChild(document.createTextNode("taille:"));
-    scaleWrap.appendChild(scaleInput);
-    row.appendChild(scaleWrap);
+    scaleRow.appendChild(document.createTextNode("Taille"));
+    scaleRow.appendChild(scaleInput);
+    details.appendChild(scaleRow);
 
     if (el.type === "iframe") {
       const urlInput = document.createElement("input");
       urlInput.type = "text";
       urlInput.placeholder = "https://...";
       urlInput.value = el.url || "";
-      urlInput.style.width = "100%";
       urlInput.addEventListener("change", () => {
         el.url = urlInput.value.trim();
         persistElements();
         renderCanvas();
       });
-      row.appendChild(urlInput);
+      details.appendChild(urlInput);
 
-      if (el.demo !== false) {
-        const btnDemo = document.createElement("button");
-        btnDemo.textContent = isDemoEnabled(el.url) ? "Démo : ON" : "Démo : OFF";
-        btnDemo.addEventListener("click", () => {
-          el.url = toggleDemoParam(el.url || "");
-          persistElements();
-          renderCanvas();
-          renderElementList();
-        });
-        row.appendChild(btnDemo);
-      }
-
-      const sizeWrap = document.createElement("div");
-      sizeWrap.className = "element-row__coords";
+      const sizeRow = document.createElement("div");
+      sizeRow.className = "detail-field";
       const wInput = document.createElement("input");
       wInput.type = "number";
       wInput.value = el.w ?? 400;
@@ -438,11 +466,23 @@ function renderElementList() {
         persistElements();
         renderCanvas();
       });
-      sizeWrap.appendChild(document.createTextNode("largeur:"));
-      sizeWrap.appendChild(wInput);
-      sizeWrap.appendChild(document.createTextNode("hauteur:"));
-      sizeWrap.appendChild(hInput);
-      row.appendChild(sizeWrap);
+      sizeRow.appendChild(document.createTextNode("L"));
+      sizeRow.appendChild(wInput);
+      sizeRow.appendChild(document.createTextNode("H"));
+      sizeRow.appendChild(hInput);
+      details.appendChild(sizeRow);
+
+      if (el.demo !== false) {
+        const btnDemo = document.createElement("button");
+        btnDemo.textContent = isDemoEnabled(el.url) ? "Démo : ON" : "Démo : OFF";
+        btnDemo.addEventListener("click", () => {
+          el.url = toggleDemoParam(el.url || "");
+          persistElements();
+          renderCanvas();
+          renderElementList();
+        });
+        details.appendChild(btnDemo);
+      }
     }
 
     if (el.type === "battery") {
@@ -459,14 +499,16 @@ function renderElementList() {
         persistElements();
         renderCanvas();
       });
-      row.appendChild(deviceSelect);
+      details.appendChild(deviceSelect);
     }
 
     if (el.type === "watermark") {
+      const uploadRow = document.createElement("div");
+      uploadRow.className = "detail-field";
       const fileInput = document.createElement("input");
       fileInput.type = "file";
       fileInput.accept = "image/png";
-      row.appendChild(fileInput);
+      uploadRow.appendChild(fileInput);
 
       const btnUpload = document.createElement("button");
       btnUpload.textContent = "Uploader";
@@ -482,29 +524,28 @@ function renderElementList() {
         renderCanvas();
         renderElementList();
       });
-      row.appendChild(btnUpload);
+      uploadRow.appendChild(btnUpload);
+      details.appendChild(uploadRow);
 
       if (el.url) {
         const preview = document.createElement("img");
         preview.src = el.url;
-        preview.style.height = "32px";
-        preview.style.background = "#000";
-        preview.style.borderRadius = "4px";
-        row.appendChild(preview);
+        preview.className = "detail-preview";
+        details.appendChild(preview);
       }
     }
 
-    const btnVisible = document.createElement("button");
-    btnVisible.textContent = el.visible === false ? "Afficher" : "Masquer";
-    btnVisible.addEventListener("click", () => toggleVisible(el.id));
-    row.appendChild(btnVisible);
+    row.appendChild(details);
 
-    const btnDelete = document.createElement("button");
-    btnDelete.textContent = "Suppr.";
-    btnDelete.addEventListener("click", () => {
-      if (confirm(`Retirer "${name.textContent}" de la scène ?`)) removeElement(el.id);
-    });
-    row.appendChild(btnDelete);
+    if (btnToggle) {
+      btnToggle.addEventListener("click", () => {
+        const isOpen = openDetailIds.has(el.id);
+        if (isOpen) openDetailIds.delete(el.id);
+        else openDetailIds.add(el.id);
+        details.style.display = isOpen ? "none" : "flex";
+        btnToggle.textContent = isOpen ? "▸" : "▾";
+      });
+    }
 
     elementList.appendChild(row);
   }
