@@ -195,6 +195,40 @@ function setElementScale(id, scale) {
   el.scale = Math.max(0.2, Math.min(4, scale));
 }
 
+const WIDGET_PROXY_PREFIX = "https://europe-west1-posty78-overlay.cloudfunctions.net/widgetProxy?url=";
+
+function getEffectiveTargetUrl(fullUrl) {
+  return fullUrl.startsWith(WIDGET_PROXY_PREFIX)
+    ? decodeURIComponent(fullUrl.slice(WIDGET_PROXY_PREFIX.length))
+    : fullUrl;
+}
+
+// Bascule ?demo=1 sur l'URL réelle du widget (que ce soit une URL directe ou passée
+// par le proxy anti-X-Frame-Options), pour prévisualiser/positionner un widget qui
+// supporte un mode démo sans attendre un vrai événement.
+function toggleDemoParam(fullUrl) {
+  const isProxied = fullUrl.startsWith(WIDGET_PROXY_PREFIX);
+  const target = getEffectiveTargetUrl(fullUrl);
+  let u;
+  try {
+    u = new URL(target);
+  } catch {
+    return fullUrl;
+  }
+  if (u.searchParams.has("demo")) u.searchParams.delete("demo");
+  else u.searchParams.set("demo", "1");
+  const newTarget = u.toString();
+  return isProxied ? WIDGET_PROXY_PREFIX + encodeURIComponent(newTarget) : newTarget;
+}
+
+function isDemoEnabled(fullUrl) {
+  try {
+    return new URL(getEffectiveTargetUrl(fullUrl || "")).searchParams.has("demo");
+  } catch {
+    return false;
+  }
+}
+
 async function persistElements() {
   if (!currentSceneId) return;
   await updateDoc(doc(db, "scenes", currentSceneId), { elements: currentElements });
@@ -391,6 +425,16 @@ function renderElementList() {
         renderCanvas();
       });
       row.appendChild(urlInput);
+
+      const btnDemo = document.createElement("button");
+      btnDemo.textContent = isDemoEnabled(el.url) ? "Démo : ON" : "Démo : OFF";
+      btnDemo.addEventListener("click", () => {
+        el.url = toggleDemoParam(el.url || "");
+        persistElements();
+        renderCanvas();
+        renderElementList();
+      });
+      row.appendChild(btnDemo);
 
       const sizeWrap = document.createElement("div");
       sizeWrap.className = "element-row__coords";
