@@ -38,7 +38,7 @@
 .hud-money {
   font-family: "Anton", sans-serif;
   font-size: 40px;
-  color: #2f7d32;
+  color: #1b5e20;
   letter-spacing: 1px;
   text-shadow:
     3px 0 0 #000, -3px 0 0 #000, 0 3px 0 #000, 0 -3px 0 #000,
@@ -49,7 +49,7 @@
 /* --- Etoiles --- */
 .hud-stars { display: flex; gap: 6px; }
 .hud-stars svg { width: 48px; height: 48px; filter: drop-shadow(0 0 3px rgba(0,0,0,0.9)); }
-.hud-star--on { fill: #ffffff; stroke: #000; stroke-width: 5px; stroke-linejoin: round; }
+.hud-star--on { fill: #ffcc00; stroke: #000; stroke-width: 5px; stroke-linejoin: round; }
 .hud-star--off { fill: rgba(255,255,255,0.12); stroke: #000; stroke-width: 5px; stroke-linejoin: round; }
 
 /* --- Barre blanche/rouge (décorative, style vie/armure) --- */
