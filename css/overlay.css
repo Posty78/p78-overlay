@@ -1,5 +1,3 @@
-@import url("https://fonts.googleapis.com/css2?family=Staatliches&family=Teko:wght@500;600&display=swap");
-
 * { box-sizing: border-box; }
 
 html, body {
@@ -30,42 +28,46 @@ html, body {
 
 /* --- Horloge --- */
 .hud-clock {
-  font-family: "Staatliches", sans-serif;
-  font-size: 56px;
+  font-family: "Anton", sans-serif;
+  font-size: 64px;
   color: #ffffff;
-  letter-spacing: 2px;
-  text-shadow: 2px 2px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
+  letter-spacing: 1px;
+  text-shadow:
+    3px 0 0 #000, -3px 0 0 #000, 0 3px 0 #000, 0 -3px 0 #000,
+    2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000;
 }
 
 /* --- Batterie / température --- */
 .hud-battery {
   font-family: "Teko", sans-serif;
   font-weight: 600;
-  font-size: 36px;
+  font-size: 38px;
   color: #ffffff;
-  text-shadow: 2px 2px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
   display: flex;
-  gap: 18px;
+  gap: 20px;
   align-items: center;
+  text-shadow: 2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000;
 }
 .hud-battery__item { display: flex; align-items: center; gap: 6px; }
 .hud-battery__item.is-low { color: #ff3b30; }
 
 /* --- Argent --- */
 .hud-money {
-  font-family: "Staatliches", sans-serif;
-  font-size: 52px;
+  font-family: "Anton", sans-serif;
+  font-size: 64px;
   color: #3adf00;
   letter-spacing: 1px;
-  text-shadow: 2px 2px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
+  text-shadow:
+    3px 0 0 #000, -3px 0 0 #000, 0 3px 0 #000, 0 -3px 0 #000,
+    2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000;
 }
 .hud-money.is-negative { color: #ff3b30; }
 
 /* --- Etoiles --- */
-.hud-stars { display: flex; gap: 4px; }
-.hud-stars svg { width: 40px; height: 40px; }
-.hud-star--on { fill: #ffe14d; stroke: #000; stroke-width: 6px; }
-.hud-star--off { fill: rgba(255,255,255,0.15); stroke: #000; stroke-width: 6px; }
+.hud-stars { display: flex; gap: 6px; }
+.hud-stars svg { width: 48px; height: 48px; filter: drop-shadow(0 0 3px rgba(0,0,0,0.9)); }
+.hud-star--on { fill: #ffffff; stroke: #000; stroke-width: 5px; stroke-linejoin: round; }
+.hud-star--off { fill: rgba(255,255,255,0.12); stroke: #000; stroke-width: 5px; stroke-linejoin: round; }
 
 /* --- Arme --- */
 .hud-weapon {
@@ -86,7 +88,7 @@ html, body {
 .hud-minimap {
   width: 320px;
   height: 320px;
-  border-radius: 12px;
+  border-radius: 50%;
   overflow: hidden;
   border: 3px solid rgba(255,255,255,0.85);
   box-shadow: 0 0 12px rgba(0,0,0,0.6);
@@ -95,8 +97,8 @@ html, body {
 
 /* --- Watermark (placeholder tant que l'asset n'est pas fourni) --- */
 .hud-watermark {
-  font-family: "Staatliches", sans-serif;
-  font-size: 34px;
-  color: rgba(255,255,255,0.8);
-  text-shadow: 2px 2px 0 #000;
+  font-family: "Anton", sans-serif;
+  font-size: 36px;
+  color: rgba(255,255,255,0.85);
+  text-shadow: 2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000;
 }
