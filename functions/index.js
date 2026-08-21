@@ -131,6 +131,16 @@ exports.widgetProxy = onRequest({ region: "europe-west1", cors: true }, async (r
       // Force le client socket.io à se connecter directement au vrai serveur, pas au proxy
       body = body.replace(/io\(\s*\{/g, `io("${origin}", {`);
       body = body.replace(/io\(\s*\)/g, `io("${origin}")`);
+
+      // Certains widgets détectent leur mode démo via location.search (ex: ?demo=1).
+      // À travers le proxy, ce paramètre est caché dans l'URL encodée du "url=" et
+      // n'apparaît jamais tel quel dans location.search. On le repasse en paramètre
+      // de la requête au proxy (?...&demo=1) et on le réinjecte ici via history.replaceState
+      // AVANT le script du widget, pour que location.search corresponde à ce qu'il attend.
+      if (req.query.demo) {
+        const bootstrap = `<script>history.replaceState(null, "", location.pathname + "?demo=1");</script>`;
+        body = body.replace(/<head[^>]*>/i, (m) => `${m}${bootstrap}`);
+      }
     }
 
     res.set("Content-Type", contentType);

@@ -197,33 +197,26 @@ function setElementScale(id, scale) {
 
 const WIDGET_PROXY_PREFIX = "https://europe-west1-posty78-overlay.cloudfunctions.net/widgetProxy?url=";
 
-function getEffectiveTargetUrl(fullUrl) {
-  return fullUrl.startsWith(WIDGET_PROXY_PREFIX)
-    ? decodeURIComponent(fullUrl.slice(WIDGET_PROXY_PREFIX.length))
-    : fullUrl;
-}
-
-// Bascule ?demo=1 sur l'URL réelle du widget (que ce soit une URL directe ou passée
-// par le proxy anti-X-Frame-Options), pour prévisualiser/positionner un widget qui
-// supporte un mode démo sans attendre un vrai événement.
+// Bascule ?demo=1 pour prévisualiser un widget sans attendre un vrai événement.
+// Sur une URL passée par le proxy anti-X-Frame-Options, demo doit rester un paramètre
+// de PREMIER niveau sur l'URL du proxy (pas caché dans l'URL cible encodée) : le proxy
+// le réinjecte lui-même côté serveur via history.replaceState pour que location.search
+// corresponde à ce que le widget attend une fois embarqué.
 function toggleDemoParam(fullUrl) {
-  const isProxied = fullUrl.startsWith(WIDGET_PROXY_PREFIX);
-  const target = getEffectiveTargetUrl(fullUrl);
   let u;
   try {
-    u = new URL(target);
+    u = new URL(fullUrl);
   } catch {
     return fullUrl;
   }
   if (u.searchParams.has("demo")) u.searchParams.delete("demo");
   else u.searchParams.set("demo", "1");
-  const newTarget = u.toString();
-  return isProxied ? WIDGET_PROXY_PREFIX + encodeURIComponent(newTarget) : newTarget;
+  return u.toString();
 }
 
 function isDemoEnabled(fullUrl) {
   try {
-    return new URL(getEffectiveTargetUrl(fullUrl || "")).searchParams.has("demo");
+    return new URL(fullUrl || "").searchParams.has("demo");
   } catch {
     return false;
   }
