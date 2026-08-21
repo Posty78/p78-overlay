@@ -28,9 +28,13 @@ export const POSTY_MAPS_FIREBASE_CONFIG = {
   databaseURL: "https://posty78-maps-default-rtdb.europe-west1.firebasedatabase.app",
 };
 
-// TODO: chemin RTDB exact utilisé par PostyMonitor pour batterie/température,
-// à confirmer avec Jean-Didier/le pote puis ajuster ici (voir plan du projet).
-export const TRACKING_DEVICE_RTDB_PATH = "devices/tracking";
+// TODO: chemins RTDB exacts utilisés par PostyMonitor / la nouvelle APK pour
+// batterie/température de chaque appareil, à confirmer puis ajuster ici.
+// "tracking" = téléphone dans la voiture (GPS), "stream" = téléphone de stream.
+export const DEVICE_RTDB_PATHS = {
+  tracking: "devices/tracking",
+  stream: "devices/stream",
+};
 
 // Doc Firestore posty78-maps où la nouvelle APK de tracking écrit la position live.
 export const TRACKING_POSITION_DOC = { collection: "tracking", document: "live" };

@@ -1,8 +1,8 @@
 import { ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
 import { mapsRtdb } from "../firebase-init.js";
-import { TRACKING_DEVICE_RTDB_PATH } from "../config.js";
+import { DEVICE_RTDB_PATHS } from "../config.js";
 
-export function create() {
+export function create(elConfig) {
   const el = document.createElement("div");
   el.className = "hud-battery";
   el.innerHTML = `
@@ -10,8 +10,11 @@ export function create() {
     <span class="hud-battery__item" data-role="temp">--°C</span>
   `;
 
-  const path = ref(mapsRtdb, TRACKING_DEVICE_RTDB_PATH);
-  onValue(path, (snapshot) => {
+  const device = elConfig?.device || "tracking";
+  const path = DEVICE_RTDB_PATHS[device] || DEVICE_RTDB_PATHS.tracking;
+
+  const dbRef = ref(mapsRtdb, path);
+  onValue(dbRef, (snapshot) => {
     const data = snapshot.val();
     if (!data) return;
 
@@ -25,7 +28,7 @@ export function create() {
     if (typeof data.temperature === "number") {
       tempEl.textContent = `🌡 ${Math.round(data.temperature)}°C`;
     }
-  }, (err) => console.warn("[battery] lecture RTDB impossible:", err.message));
+  }, (err) => console.warn(`[battery:${device}] lecture RTDB impossible:`, err.message));
 
   return el;
 }

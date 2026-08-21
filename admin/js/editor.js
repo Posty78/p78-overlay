@@ -20,11 +20,11 @@ const TYPE_LABELS = {
   minimap: "Mini map",
   iframe: "Widget externe (URL)",
 };
-const MULTI_INSTANCE_TYPES = new Set(["iframe"]);
+const MULTI_INSTANCE_TYPES = new Set(["iframe", "battery"]);
 
 const DEFAULT_ELEMENTS = [
   { id: "clock", type: "clock", x: 1750, y: 30, scale: 1, visible: true },
-  { id: "battery", type: "battery", x: 1440, y: 40, scale: 1, visible: true },
+  { id: "battery", type: "battery", x: 1440, y: 40, scale: 1, visible: true, device: "tracking" },
   { id: "stars", type: "stars", x: 1630, y: 110, scale: 1, visible: true },
   { id: "money", type: "money", x: 1630, y: 165, scale: 1, visible: true },
   { id: "weapon", type: "weapon", x: 1720, y: 860, scale: 1, visible: true },
@@ -150,6 +150,10 @@ function onAddElement() {
     newEl.url = "";
     newEl.w = 400;
     newEl.h = 300;
+  }
+  if (type === "battery") {
+    const usedDevices = currentElements.filter((e) => e.type === "battery").map((e) => e.device);
+    newEl.device = usedDevices.includes("tracking") ? "stream" : "tracking";
   }
 
   currentElements.push(newEl);
@@ -407,6 +411,23 @@ function renderElementList() {
       sizeWrap.appendChild(document.createTextNode("hauteur:"));
       sizeWrap.appendChild(hInput);
       row.appendChild(sizeWrap);
+    }
+
+    if (el.type === "battery") {
+      const deviceSelect = document.createElement("select");
+      for (const [value, labelText] of [["tracking", "Téléphone tracking"], ["stream", "Téléphone stream"]]) {
+        const opt = document.createElement("option");
+        opt.value = value;
+        opt.textContent = labelText;
+        if ((el.device || "tracking") === value) opt.selected = true;
+        deviceSelect.appendChild(opt);
+      }
+      deviceSelect.addEventListener("change", () => {
+        el.device = deviceSelect.value;
+        persistElements();
+        renderCanvas();
+      });
+      row.appendChild(deviceSelect);
     }
 
     const btnVisible = document.createElement("button");
