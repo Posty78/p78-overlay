@@ -91,6 +91,18 @@
   filter: drop-shadow(0 0 3px rgba(0,0,0,0.9));
 }
 
+/* --- Météo (ville + température) --- */
+.hud-weather {
+  font-family: "Teko", sans-serif;
+  font-weight: 600;
+  font-size: 30px;
+  color: #ffffff;
+  display: flex;
+  gap: 10px;
+  align-items: baseline;
+  text-shadow: 2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000;
+}
+
 /* --- Mini map --- */
 .hud-minimap {
   width: 320px;

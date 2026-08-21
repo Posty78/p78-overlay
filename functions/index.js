@@ -6,6 +6,7 @@ admin.initializeApp();
 const db = admin.firestore();
 
 const COMMAND_SECRET = defineSecret("COMMAND_SECRET");
+const WEATHER_API_KEY = defineSecret("WEATHER_API_KEY");
 
 // UID Firebase Auth whitelistés (Jean-Didier + pote Botsty78)
 const ADMIN_UIDS = [
@@ -152,6 +153,67 @@ exports.widgetProxy = onRequest({ region: "europe-west1", cors: true }, async (r
     res.status(502).send("proxy error: " + err.message);
   }
 });
+
+// Cache mémoire simple (par instance de fonction chaude) pour éviter de re-facturer
+// des appels Geocoding/Weather quand la position n'a quasiment pas bougé entre deux
+// appels du widget météo. Clé = position arrondie à ~1km, TTL 10 min.
+const weatherCache = new Map();
+const WEATHER_CACHE_TTL_MS = 10 * 60 * 1000;
+
+function extractCity(geocodeResult) {
+  for (const result of geocodeResult.results || []) {
+    const locality = result.address_components?.find(
+      (c) => c.types.includes("locality") || c.types.includes("postal_town")
+    );
+    if (locality) return locality.long_name;
+  }
+  return geocodeResult.results?.[0]?.formatted_address?.split(",")[0] || null;
+}
+
+// Ville + météo réelles à partir d'une position GPS, pour le petit widget météo de
+// l'overlay. Clé Geocoding/Weather gardée côté serveur (pas de restriction par
+// referrer possible sur ces APIs, donc jamais exposée au navigateur).
+exports.weatherProxy = onRequest(
+  { region: "europe-west1", secrets: [WEATHER_API_KEY], cors: true },
+  async (req, res) => {
+    const lat = parseFloat(req.query.lat);
+    const lng = parseFloat(req.query.lng);
+    if (Number.isNaN(lat) || Number.isNaN(lng)) {
+      res.status(400).json({ ok: false, error: "lat/lng manquants ou invalides" });
+      return;
+    }
+
+    const cacheKey = `${lat.toFixed(2)},${lng.toFixed(2)}`;
+    const cached = weatherCache.get(cacheKey);
+    if (cached && Date.now() - cached.at < WEATHER_CACHE_TTL_MS) {
+      res.json(cached.data);
+      return;
+    }
+
+    const key = WEATHER_API_KEY.value();
+
+    try {
+      const [geocodeRes, weatherRes] = await Promise.all([
+        fetch(`https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${key}`),
+        fetch(`https://weather.googleapis.com/v1/currentConditions:lookup?key=${key}&location.latitude=${lat}&location.longitude=${lng}`),
+      ]);
+
+      const geocodeData = await geocodeRes.json();
+      const weatherData = await weatherRes.json();
+
+      const data = {
+        ok: true,
+        city: extractCity(geocodeData),
+        tempC: weatherData?.temperature?.degrees ?? null,
+      };
+
+      weatherCache.set(cacheKey, { at: Date.now(), data });
+      res.json(data);
+    } catch (err) {
+      res.status(502).json({ ok: false, error: err.message });
+    }
+  }
+);
 
 // Appelée depuis le panel admin (bouton reset). Auth requise : ID token Firebase d'un UID whitelisté.
 exports.resetState = onRequest({ region: "europe-west1", cors: true }, async (req, res) => {

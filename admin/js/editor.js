@@ -11,8 +11,9 @@ import * as weapon from "../../js/elements/weapon.js";
 import * as minimap from "../../js/elements/minimap.js";
 import * as iframe from "../../js/elements/iframe.js";
 import * as watermark from "../../js/elements/watermark.js";
+import * as weather from "../../js/elements/weather.js";
 
-const ELEMENT_MODULES = { clock, battery, money, stars, weapon, minimap, iframe, watermark };
+const ELEMENT_MODULES = { clock, battery, money, stars, weapon, minimap, iframe, watermark, weather };
 const TYPE_LABELS = {
   clock: "Horloge (+ barres)",
   battery: "Batterie / Temp",
@@ -22,6 +23,7 @@ const TYPE_LABELS = {
   minimap: "Mini map",
   iframe: "Widget externe (URL)",
   watermark: "Filigrane (PNG)",
+  weather: "Météo (ville + temp)",
 };
 const MULTI_INSTANCE_TYPES = new Set(["iframe", "battery"]);
 
@@ -32,6 +34,7 @@ const DEFAULT_ELEMENTS = [
   { id: "money", type: "money", x: 1630, y: 165, scale: 1, visible: true },
   { id: "weapon", type: "weapon", x: 1720, y: 860, scale: 1, visible: true },
   { id: "minimap", type: "minimap", x: 40, y: 720, scale: 1, visible: true },
+  { id: "weather", type: "weather", x: 90, y: 860, scale: 1, visible: true },
   { id: "watermark", type: "watermark", x: 830, y: 20, scale: 1, visible: true },
 ];
 

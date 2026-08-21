@@ -40,9 +40,10 @@ export const DEVICE_RTDB_PATHS = {
 // Doc Firestore posty78-maps où la nouvelle APK de tracking écrit la position live.
 export const TRACKING_POSITION_DOC = { collection: "tracking", document: "live" };
 
-// TODO: clé API Google Maps JS (Google Cloud Console > APIs & Services > Identifiants),
-// à restreindre à "Maps JavaScript API" + referrer overlay.posty78.fr
-export const GOOGLE_MAPS_API_KEY = "";
+// Clé API Google Maps JS, restreinte au referrer overlay.posty78.fr et à la seule
+// Maps JavaScript API (créée directement, aucune donnée sensible : c'est une clé
+// browser-facing par design, sa sécurité vient de la restriction de referrer).
+export const GOOGLE_MAPS_API_KEY = "AIzaSyCByDf_sBj3IoyAgY5oQlLcnTE8ipoGTTc";
 
 // Base URL des Cloud Functions posty78-overlay (région europe-west1)
 export const FUNCTIONS_BASE_URL = "https://europe-west1-posty78-overlay.cloudfunctions.net";

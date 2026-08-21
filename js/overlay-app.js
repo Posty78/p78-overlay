@@ -8,8 +8,9 @@ import * as weapon from "./elements/weapon.js";
 import * as minimap from "./elements/minimap.js";
 import * as iframe from "./elements/iframe.js";
 import * as watermark from "./elements/watermark.js";
+import * as weather from "./elements/weather.js";
 
-const ELEMENTS = { clock, battery, money, stars, weapon, minimap, iframe, watermark };
+const ELEMENTS = { clock, battery, money, stars, weapon, minimap, iframe, watermark, weather };
 
 const stage = document.getElementById("stage");
 let mountedNodes = {}; // elementId -> { node, type }
