@@ -21,9 +21,10 @@ export function create(elConfig) {
     const batteryEl = el.querySelector('[data-role="battery"]');
     const tempEl = el.querySelector('[data-role="temp"]');
 
-    if (typeof data.battery === "number") {
-      batteryEl.textContent = `🔋 ${Math.round(data.battery)}%`;
-      batteryEl.classList.toggle("is-low", data.battery <= 20);
+    if (typeof data.percentage === "number") {
+      const chargingIcon = data.charging ? "⚡" : "🔋";
+      batteryEl.textContent = `${chargingIcon} ${Math.round(data.percentage)}%`;
+      batteryEl.classList.toggle("is-low", data.percentage <= 20 && !data.charging);
     }
     if (typeof data.temperature === "number") {
       tempEl.textContent = `🌡 ${Math.round(data.temperature)}°C`;
