@@ -208,12 +208,17 @@ function renderCanvas() {
     node.style.pointerEvents = "none";
     wrapper.appendChild(node);
 
+    const handle = document.createElement("div");
+    handle.className = "editor-el__resize-handle";
+    wrapper.appendChild(handle);
+
     wrapper.style.left = `${elConfig.x}px`;
     wrapper.style.top = `${elConfig.y}px`;
     wrapper.style.transform = `scale(${elConfig.scale ?? 1})`;
     wrapper.dataset.visible = elConfig.visible !== false ? "true" : "false";
 
     wireDrag(wrapper, elConfig.id);
+    wireResize(wrapper, handle, elConfig.id);
     stage.appendChild(wrapper);
     mountedNodes[elConfig.id] = { wrapper, node, type: elConfig.type };
   }
@@ -259,6 +264,42 @@ function wireDrag(wrapper, id) {
   wrapper.addEventListener("pointerup", () => {
     if (!dragging) return;
     dragging = false;
+    persistElements();
+    renderElementList();
+  });
+}
+
+function wireResize(wrapper, handle, id) {
+  let resizing = false;
+  let startClientX = 0;
+  let startClientY = 0;
+  let startScale = 1;
+
+  handle.addEventListener("pointerdown", (e) => {
+    e.stopPropagation();
+    resizing = true;
+    handle.setPointerCapture(e.pointerId);
+    startClientX = e.clientX;
+    startClientY = e.clientY;
+    const el = currentElements.find((c) => c.id === id);
+    startScale = el.scale ?? 1;
+  });
+
+  handle.addEventListener("pointermove", (e) => {
+    if (!resizing) return;
+    e.stopPropagation();
+    const dx = (e.clientX - startClientX) / stageScale;
+    const dy = (e.clientY - startClientY) / stageScale;
+    const delta = (dx + dy) / 2 / 150;
+    const newScale = Math.max(0.2, Math.min(4, startScale + delta));
+    wrapper.style.transform = `scale(${newScale})`;
+    setElementScale(id, newScale);
+  });
+
+  handle.addEventListener("pointerup", (e) => {
+    if (!resizing) return;
+    e.stopPropagation();
+    resizing = false;
     persistElements();
     renderElementList();
   });
