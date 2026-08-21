@@ -79,7 +79,12 @@
   border: 2px solid rgba(140,255,150,0.55);
   border-radius: 8px;
 }
-.hud-weapon img,
+.hud-weapon img {
+  width: 92%;
+  height: 92%;
+  object-fit: contain;
+  filter: drop-shadow(0 0 3px rgba(0,0,0,0.9));
+}
 .hud-weapon svg {
   max-width: 70%;
   max-height: 70%;
