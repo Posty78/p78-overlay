@@ -39,20 +39,18 @@
 
   <div id="main">
     <div id="sidebar">
-      <section class="panel">
+      <section class="panel panel--elements">
         <h2>Éléments de la scène</h2>
         <div id="element-list"></div>
-        <div style="display:flex; gap:8px; margin-top:8px;">
+        <div class="sidebar-row">
           <select id="add-element-type"></select>
           <button id="btn-add-element">+ Ajouter</button>
         </div>
       </section>
 
-      <section class="panel">
-        <h2>Argent / Étoiles (manuel)</h2>
-        <div class="state-row">
-          <span>Argent : <strong id="state-money-display">$0</strong></span>
-        </div>
+      <section class="panel panel--state">
+        <h2>Argent / Étoiles</h2>
+        <div class="state-row-title">Argent : <strong id="state-money-display">$0</strong></div>
         <div class="state-row">
           <button data-money-delta="-100">-100</button>
           <button data-money-delta="-50">-50</button>
@@ -63,9 +61,7 @@
           <input type="number" id="money-set-input" placeholder="valeur exacte">
           <button id="btn-money-set">Définir</button>
         </div>
-        <div class="state-row" style="margin-top:12px;">
-          <span>Étoiles : <strong id="state-stars-display">0</strong> / 6</span>
-        </div>
+        <div class="state-row-title">Étoiles : <strong id="state-stars-display">0</strong> / 6</div>
         <div class="state-row">
           <button id="btn-stars-minus">− 1</button>
           <button id="btn-stars-plus">+ 1</button>
@@ -73,8 +69,8 @@
         </div>
       </section>
 
-      <section class="panel">
-        <h2>Armes (mapping commande → PNG)</h2>
+      <section class="panel panel--weapons">
+        <h2>Armes</h2>
         <div id="weapon-list"></div>
         <form id="weapon-upload-form">
           <input type="text" id="weapon-command" placeholder="nom commande (ex: gun)" required>
@@ -83,7 +79,7 @@
           <button type="submit" class="primary">Uploader</button>
         </form>
         <div class="hint">Format carré obligatoire, PNG avec transparence recommandé.</div>
-        <button id="btn-weapon-clear" style="margin-top:8px;">Remettre le poing par défaut</button>
+        <button id="btn-weapon-clear" class="sidebar-row">Remettre le poing par défaut</button>
       </section>
     </div>
 

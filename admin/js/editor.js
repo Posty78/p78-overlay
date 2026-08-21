@@ -378,30 +378,6 @@ function renderElementList() {
       row.appendChild(labelInput);
     }
 
-    const coords = document.createElement("div");
-    coords.className = "element-row__coords";
-    const xInput = document.createElement("input");
-    xInput.type = "number";
-    xInput.value = el.x;
-    xInput.addEventListener("change", () => {
-      setElementPosition(el.id, Number(xInput.value), el.y);
-      persistElements();
-      renderCanvas();
-    });
-    const yInput = document.createElement("input");
-    yInput.type = "number";
-    yInput.value = el.y;
-    yInput.addEventListener("change", () => {
-      setElementPosition(el.id, el.x, Number(yInput.value));
-      persistElements();
-      renderCanvas();
-    });
-    coords.appendChild(document.createTextNode("x:"));
-    coords.appendChild(xInput);
-    coords.appendChild(document.createTextNode("y:"));
-    coords.appendChild(yInput);
-    row.appendChild(coords);
-
     const scaleWrap = document.createElement("div");
     scaleWrap.className = "element-row__coords";
     const scaleInput = document.createElement("input");
