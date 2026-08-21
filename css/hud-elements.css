@@ -43,6 +43,22 @@
 .hud-star--on { fill: #ffffff; stroke: #000; stroke-width: 5px; stroke-linejoin: round; }
 .hud-star--off { fill: rgba(255,255,255,0.12); stroke: #000; stroke-width: 5px; stroke-linejoin: round; }
 
+/* --- Barre blanche/rouge (décorative, style vie/armure) --- */
+.hud-healthbar {
+  width: 220px;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.hud-healthbar__bar {
+  height: 10px;
+  border-radius: 2px;
+  border: 1px solid rgba(0,0,0,0.6);
+  box-shadow: 0 0 4px rgba(0,0,0,0.7);
+}
+.hud-healthbar__bar--white { background: #f2f2f2; }
+.hud-healthbar__bar--red   { background: #e0263f; }
+
 /* --- Arme --- */
 .hud-weapon {
   width: 160px;
@@ -50,7 +66,9 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  background: transparent;
+  background: rgba(0,0,0,0.55);
+  border: 2px solid rgba(140,255,150,0.55);
+  border-radius: 8px;
 }
 .hud-weapon img,
 .hud-weapon svg {
