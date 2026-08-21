@@ -2,15 +2,16 @@
 
 /* --- Horloge (+ barres vie/armure fusionnées en dessous) --- */
 .hud-clock-group {
-  width: 140px;
-  display: flex;
+  display: inline-flex;
   flex-direction: column;
   align-items: stretch;
   gap: 4px;
 }
 .hud-clock {
-  font-family: "Anton", sans-serif;
-  font-size: 36px;
+  font-family: "Rajdhani", sans-serif;
+  font-weight: 700;
+  font-size: 40px;
+  line-height: 1;
   color: #ffffff;
   text-align: center;
   letter-spacing: 1px;
