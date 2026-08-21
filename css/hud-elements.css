@@ -103,6 +103,14 @@
 }
 .hud-minimap__map { width: 100%; height: 100%; }
 
+/* --- Widget externe (iframe) --- */
+.hud-iframe {
+  overflow: hidden;
+}
+.hud-iframe iframe {
+  display: block;
+}
+
 /* --- Watermark (placeholder tant que l'asset n'est pas fourni) --- */
 .hud-watermark {
   font-family: "Anton", sans-serif;

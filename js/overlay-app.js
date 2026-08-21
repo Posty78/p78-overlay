@@ -6,8 +6,9 @@ import * as money from "./elements/money.js";
 import * as stars from "./elements/stars.js";
 import * as weapon from "./elements/weapon.js";
 import * as minimap from "./elements/minimap.js";
+import * as iframe from "./elements/iframe.js";
 
-const ELEMENTS = { clock, battery, money, stars, weapon, minimap };
+const ELEMENTS = { clock, battery, money, stars, weapon, minimap, iframe };
 
 const stage = document.getElementById("stage");
 let mountedNodes = {}; // elementId -> { node, type }
@@ -46,13 +47,14 @@ function renderScene(elements) {
 
     let mounted = mountedNodes[elConfig.id];
     if (!mounted) {
-      const node = module.create();
+      const node = module.create(elConfig);
       node.classList.add("hud-el");
       stage.appendChild(node);
       mounted = { node, type: elConfig.type };
       mountedNodes[elConfig.id] = mounted;
     }
 
+    if (module.applyConfig) module.applyConfig(mounted.node, elConfig);
     positionNode(mounted.node, elConfig);
   }
 

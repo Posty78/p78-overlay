@@ -8,8 +8,9 @@ import * as money from "../../js/elements/money.js";
 import * as stars from "../../js/elements/stars.js";
 import * as weapon from "../../js/elements/weapon.js";
 import * as minimap from "../../js/elements/minimap.js";
+import * as iframe from "../../js/elements/iframe.js";
 
-const ELEMENT_MODULES = { clock, battery, money, stars, weapon, minimap };
+const ELEMENT_MODULES = { clock, battery, money, stars, weapon, minimap, iframe };
 const TYPE_LABELS = {
   clock: "Horloge (+ barres)",
   battery: "Batterie / Temp",
@@ -17,7 +18,9 @@ const TYPE_LABELS = {
   stars: "Étoiles",
   weapon: "Arme",
   minimap: "Mini map",
+  iframe: "Widget externe (URL)",
 };
+const MULTI_INSTANCE_TYPES = new Set(["iframe"]);
 
 const DEFAULT_ELEMENTS = [
   { id: "clock", type: "clock", x: 1750, y: 30, scale: 1, visible: true },
@@ -133,12 +136,23 @@ async function onActivateScene() {
 
 function onAddElement() {
   const type = addTypeSelect.value;
-  if (currentElements.some((el) => el.type === type)) {
+  const allowMulti = MULTI_INSTANCE_TYPES.has(type);
+
+  if (!allowMulti && currentElements.some((el) => el.type === type)) {
     alert("Cet élément est déjà présent dans la scène.");
     return;
   }
+
   const defaults = DEFAULT_ELEMENTS.find((el) => el.type === type) || { x: 100, y: 100, scale: 1 };
-  currentElements.push({ id: type, type, x: defaults.x, y: defaults.y, scale: 1, visible: true });
+  const id = allowMulti ? `${type}-${Date.now()}` : type;
+  const newEl = { id, type, x: defaults.x, y: defaults.y, scale: 1, visible: true };
+  if (type === "iframe") {
+    newEl.url = "";
+    newEl.w = 400;
+    newEl.h = 300;
+  }
+
+  currentElements.push(newEl);
   persistElements();
   renderCanvas();
   renderElementList();
@@ -204,7 +218,7 @@ function renderCanvas() {
     label.textContent = TYPE_LABELS[elConfig.type] || elConfig.type;
     wrapper.appendChild(label);
 
-    const node = module.create();
+    const node = module.create(elConfig);
     node.style.pointerEvents = "none";
     wrapper.appendChild(node);
 
@@ -356,6 +370,44 @@ function renderElementList() {
     scaleWrap.appendChild(document.createTextNode("taille:"));
     scaleWrap.appendChild(scaleInput);
     row.appendChild(scaleWrap);
+
+    if (el.type === "iframe") {
+      const urlInput = document.createElement("input");
+      urlInput.type = "text";
+      urlInput.placeholder = "https://...";
+      urlInput.value = el.url || "";
+      urlInput.style.width = "100%";
+      urlInput.addEventListener("change", () => {
+        el.url = urlInput.value.trim();
+        persistElements();
+        renderCanvas();
+      });
+      row.appendChild(urlInput);
+
+      const sizeWrap = document.createElement("div");
+      sizeWrap.className = "element-row__coords";
+      const wInput = document.createElement("input");
+      wInput.type = "number";
+      wInput.value = el.w ?? 400;
+      wInput.addEventListener("change", () => {
+        el.w = Number(wInput.value);
+        persistElements();
+        renderCanvas();
+      });
+      const hInput = document.createElement("input");
+      hInput.type = "number";
+      hInput.value = el.h ?? 300;
+      hInput.addEventListener("change", () => {
+        el.h = Number(hInput.value);
+        persistElements();
+        renderCanvas();
+      });
+      sizeWrap.appendChild(document.createTextNode("largeur:"));
+      sizeWrap.appendChild(wInput);
+      sizeWrap.appendChild(document.createTextNode("hauteur:"));
+      sizeWrap.appendChild(hInput);
+      row.appendChild(sizeWrap);
+    }
 
     const btnVisible = document.createElement("button");
     btnVisible.textContent = el.visible === false ? "Afficher" : "Masquer";
