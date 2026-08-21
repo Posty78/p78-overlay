@@ -1,0 +1,38 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function isAdmin() {
+      return request.auth != null && request.auth.uid in [
+        "EJFPIvxkW3ZFifiwYPINg3uixRr1",
+        "FMubOvLPieNplbiSv07s1Tvf63X2"
+      ];
+    }
+
+    // Scènes et positionnement des éléments : lecture publique (overlay OBS non authentifié),
+    // écriture réservée aux 2 admins.
+    match /scenes/{sceneId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    match /settings/{docId} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Mapping commande -> PNG d'arme : lecture publique, écriture admin.
+    match /weapons/{command} {
+      allow read: if true;
+      allow write: if isAdmin();
+    }
+
+    // Etat piloté par le chat (argent/étoiles/arme) : lecture publique, écriture uniquement
+    // via les Cloud Functions (Admin SDK, contourne ces règles). Aucune écriture client directe.
+    match /state/{docId} {
+      allow read: if true;
+      allow write: if false;
+    }
+  }
+}

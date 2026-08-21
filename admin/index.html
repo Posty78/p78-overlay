@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Posty78 Overlay — Admin</title>
+<link rel="stylesheet" href="../css/admin.css">
+</head>
+<body>
+
+<div id="login-screen">
+  <form id="login-form">
+    <h2 style="margin:0 0 4px;">Posty78 Overlay</h2>
+    <input type="email" id="login-email" placeholder="Email" autocomplete="username" required>
+    <input type="password" id="login-password" placeholder="Mot de passe" autocomplete="current-password" required>
+    <div id="login-error"></div>
+    <button type="submit" class="primary">Se connecter</button>
+  </form>
+</div>
+
+<div id="app-screen">
+  <div id="topbar">
+    <div class="scenes">
+      <label for="scene-select" class="hint">Scène en édition :</label>
+      <select id="scene-select"></select>
+      <button id="btn-activate-scene" class="primary">Activer sur OBS</button>
+      <span id="active-scene-badge" class="hint"></span>
+      <button id="btn-new-scene">+ Nouvelle scène</button>
+    </div>
+    <div style="display:flex; gap:8px; align-items:center;">
+      <button id="btn-reset" class="danger">Reset (argent/étoiles/arme)</button>
+      <button id="btn-logout">Déconnexion</button>
+    </div>
+  </div>
+
+  <div id="main">
+    <div id="sidebar">
+      <section class="panel">
+        <h2>Éléments de la scène</h2>
+        <div id="element-list"></div>
+        <div style="display:flex; gap:8px; margin-top:8px;">
+          <select id="add-element-type"></select>
+          <button id="btn-add-element">+ Ajouter</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Armes (mapping commande → PNG)</h2>
+        <div id="weapon-list"></div>
+        <form id="weapon-upload-form">
+          <input type="text" id="weapon-command" placeholder="nom commande (ex: gun)" required>
+          <input type="file" id="weapon-file" accept="image/png" required>
+          <div id="weapon-upload-warning" class="warn"></div>
+          <button type="submit" class="primary">Uploader</button>
+        </form>
+        <div class="hint">Format carré obligatoire, PNG avec transparence recommandé.</div>
+      </section>
+    </div>
+
+    <div id="canvas-wrap">
+      <div id="canvas-stage-wrapper">
+        <div id="canvas-stage"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module" src="js/app.js"></script>
+</body>
+</html>
