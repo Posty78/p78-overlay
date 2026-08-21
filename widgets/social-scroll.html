@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<style>
+* { margin:0; padding:0; box-sizing:border-box; }
+html, body {
+  width: 480px;
+  height: 270px;
+  background: transparent !important;
+  overflow: hidden;
+}
+.viewport {
+  width: 480px;
+  height: 270px;
+  overflow: hidden;
+  position: relative;
+}
+.slider {
+  position: absolute;
+  top: 0; left: 0;
+  width: 480px;
+  transition: top 0.9s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.card {
+  width: 480px;
+  height: 270px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 24px;
+  background: transparent;
+}
+.card img {
+  width: 52px;
+  height: 52px;
+  border-radius: 12px;
+}
+.card span {
+  font-family: Arial Black, Arial, sans-serif;
+  font-size: 30px;
+  font-weight: 900;
+  color: #ffffff;
+  text-shadow:
+    -2px -2px 0 #000,
+     2px -2px 0 #000,
+    -2px  2px 0 #000,
+     2px  2px 0 #000,
+     0px  2px 0 #000,
+     0px -2px 0 #000,
+     2px  0px 0 #000,
+    -2px  0px 0 #000;
+}
+</style>
+</head>
+<body>
+<div class="viewport">
+  <div class="slider" id="slider"></div>
+</div>
+<script>
+const socials = [
+  { url: 'kick.com/Posty78',         logo: 'https://www.google.com/s2/favicons?domain=kick.com&sz=64' },
+  { url: 'tiktok.com/@kick.posty78', logo: 'https://www.google.com/s2/favicons?domain=tiktok.com&sz=64' },
+  { url: 'youtube.com/@Posty78vod',  logo: 'https://www.google.com/s2/favicons?domain=youtube.com&sz=64' },
+  { url: 'instagram.com/posty.78',   logo: 'https://www.google.com/s2/favicons?domain=instagram.com&sz=64' },
+  { url: 'x.com/posty_78',           logo: 'https://www.google.com/s2/favicons?domain=x.com&sz=64' },
+  { url: 'facebook.com/kick.posty78', logo: 'https://www.google.com/s2/favicons?domain=facebook.com&sz=64' },
+  { url: 'snapchat.com/@kick.posty78', logo: 'https://www.google.com/s2/favicons?domain=snapchat.com&sz=64' }
+];
+
+const CARD_H = 270;
+const slider = document.getElementById('slider');
+let current = 0;
+
+function buildCard(s) {
+  const c = document.createElement('div');
+  c.className = 'card';
+  c.innerHTML = '<img src="' + s.logo + '" alt=""/><span>' + s.url + '</span>';
+  return c;
+}
+
+socials.forEach(s => slider.appendChild(buildCard(s)));
+slider.appendChild(buildCard(socials[0]));
+
+function next() {
+  current++;
+  slider.style.transition = 'top 0.9s cubic-bezier(0.4,0,0.2,1)';
+  slider.style.top = (-current * CARD_H) + 'px';
+  if (current === socials.length) {
+    setTimeout(function() {
+      slider.style.transition = 'none';
+      current = 0;
+      slider.style.top = '0px';
+    }, 950);
+  }
+}
+
+setInterval(next, 10000);
+</script>
+</body>
+</html>
