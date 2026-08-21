@@ -92,6 +92,57 @@ exports.commandWebhook = onRequest(
   }
 );
 
+// Domaines autorisés à être proxifiés (évite d'exposer un proxy ouvert exploitable).
+const ALLOWED_PROXY_HOSTS = ["posty78.fr"];
+
+// Sert un widget externe qui bloque son intégration en iframe (X-Frame-Options/CSP) sans
+// toucher au serveur source : récupère la page côté serveur, ne retransmet pas ces en-têtes,
+// et absolutise les chemins relatifs + le endpoint socket.io pour que le widget reste
+// pleinement fonctionnel (connexion temps réel branchée directement sur le vrai serveur).
+exports.widgetProxy = onRequest({ region: "europe-west1", cors: true }, async (req, res) => {
+  const targetUrl = req.query.url;
+  if (!targetUrl) {
+    res.status(400).send("missing url param");
+    return;
+  }
+
+  let parsed;
+  try {
+    parsed = new URL(targetUrl);
+  } catch {
+    res.status(400).send("invalid url");
+    return;
+  }
+
+  if (!ALLOWED_PROXY_HOSTS.includes(parsed.hostname)) {
+    res.status(403).send("host not allowed");
+    return;
+  }
+
+  try {
+    const upstream = await fetch(targetUrl);
+    const contentType = upstream.headers.get("content-type") || "text/html";
+    let body = await upstream.text();
+
+    if (contentType.includes("text/html")) {
+      const origin = parsed.origin;
+      // Absolutise les chemins racine-relatifs (src="/..." href="/...")
+      body = body.replace(/(src|href)="\/(?!\/)/g, `$1="${origin}/`);
+      // Force le client socket.io à se connecter directement au vrai serveur, pas au proxy
+      body = body.replace(/io\(\s*\{/g, `io("${origin}", {`);
+      body = body.replace(/io\(\s*\)/g, `io("${origin}")`);
+    }
+
+    res.set("Content-Type", contentType);
+    res.set("Cache-Control", "no-store");
+    // Volontairement aucun X-Frame-Options / CSP frame-ancestors transmis : c'est tout
+    // l'intérêt du proxy, autoriser l'intégration que la source interdit.
+    res.status(upstream.status).send(body);
+  } catch (err) {
+    res.status(502).send("proxy error: " + err.message);
+  }
+});
+
 // Appelée depuis le panel admin (bouton reset). Auth requise : ID token Firebase d'un UID whitelisté.
 exports.resetState = onRequest({ region: "europe-west1", cors: true }, async (req, res) => {
   const authHeader = req.get("authorization") || "";
