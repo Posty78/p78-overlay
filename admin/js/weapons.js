@@ -1,5 +1,5 @@
-import { collection, doc, getDocs, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+import { collection, doc, getDocs, setDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+import { ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 import { db, storage } from "../../js/firebase-init.js";
 
 const weaponList = document.getElementById("weapon-list");
@@ -8,6 +8,8 @@ const commandInput = document.getElementById("weapon-command");
 const fileInput = document.getElementById("weapon-file");
 const warningEl = document.getElementById("weapon-upload-warning");
 
+let knownCommands = new Set();
+
 export async function initWeapons() {
   await refreshWeaponList();
   form.addEventListener("submit", onSubmit);
@@ -15,8 +17,11 @@ export async function initWeapons() {
 
 async function refreshWeaponList() {
   weaponList.innerHTML = "";
+  knownCommands = new Set();
+
   const snap = await getDocs(collection(db, "weapons"));
   snap.forEach((docSnap) => {
+    knownCommands.add(docSnap.id);
     const data = docSnap.data();
     const row = document.createElement("div");
     row.className = "weapon-row";
@@ -30,8 +35,20 @@ async function refreshWeaponList() {
     cmd.textContent = `!${docSnap.id}`;
     row.appendChild(cmd);
 
+    const btnDelete = document.createElement("button");
+    btnDelete.textContent = "Suppr.";
+    btnDelete.addEventListener("click", () => onDelete(docSnap.id));
+    row.appendChild(btnDelete);
+
     weaponList.appendChild(row);
   });
+
+  if (knownCommands.size === 0) {
+    const hint = document.createElement("div");
+    hint.className = "hint";
+    hint.textContent = "Aucune arme uploadée pour l'instant.";
+    weaponList.appendChild(hint);
+  }
 }
 
 async function onSubmit(e) {
@@ -41,6 +58,11 @@ async function onSubmit(e) {
   const command = commandInput.value.trim().toLowerCase().replace(/^!/, "");
   const file = fileInput.files[0];
   if (!command || !file) return;
+
+  if (knownCommands.has(command)) {
+    const replace = confirm(`La commande "!${command}" a déjà une image. La remplacer ?`);
+    if (!replace) return;
+  }
 
   const dims = await getImageDimensions(file);
   if (dims.width !== dims.height) {
@@ -60,6 +82,17 @@ async function onSubmit(e) {
   await setDoc(doc(db, "weapons", command), { imageUrl, uploadedAt: serverTimestamp() });
 
   form.reset();
+  await refreshWeaponList();
+}
+
+async function onDelete(command) {
+  if (!confirm(`Supprimer la commande "!${command}" et son image ?`)) return;
+  await deleteDoc(doc(db, "weapons", command));
+  try {
+    await deleteObject(ref(storage, `weapons/${command}.png`));
+  } catch (err) {
+    console.warn("[weapons] suppression Storage échouée:", err.message);
+  }
   await refreshWeaponList();
 }
 

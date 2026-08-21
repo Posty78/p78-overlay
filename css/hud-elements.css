@@ -52,10 +52,12 @@
   justify-content: center;
   background: transparent;
 }
-.hud-weapon img {
-  max-width: 100%;
-  max-height: 100%;
+.hud-weapon img,
+.hud-weapon svg {
+  max-width: 70%;
+  max-height: 70%;
   object-fit: contain;
+  filter: drop-shadow(0 0 3px rgba(0,0,0,0.9));
 }
 
 /* --- Mini map --- */
