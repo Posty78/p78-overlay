@@ -111,10 +111,11 @@
   display: block;
 }
 
-/* --- Watermark (placeholder tant que l'asset n'est pas fourni) --- */
-.hud-watermark {
-  font-family: "Anton", sans-serif;
-  font-size: 36px;
-  color: rgba(255,255,255,0.85);
-  text-shadow: 2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000;
+/* --- Watermark (PNG uploadé depuis le panel) --- */
+.hud-watermark img {
+  display: block;
+  max-width: 260px;
+  max-height: 100px;
+  object-fit: contain;
+  filter: drop-shadow(0 0 4px rgba(0,0,0,0.6));
 }

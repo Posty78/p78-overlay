@@ -1,7 +1,8 @@
 import {
   collection, doc, getDocs, getDoc, setDoc, updateDoc, onSnapshot,
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import { db } from "../../js/firebase-init.js";
+import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
+import { db, storage } from "../../js/firebase-init.js";
 import * as clock from "../../js/elements/clock.js";
 import * as battery from "../../js/elements/battery.js";
 import * as money from "../../js/elements/money.js";
@@ -9,8 +10,9 @@ import * as stars from "../../js/elements/stars.js";
 import * as weapon from "../../js/elements/weapon.js";
 import * as minimap from "../../js/elements/minimap.js";
 import * as iframe from "../../js/elements/iframe.js";
+import * as watermark from "../../js/elements/watermark.js";
 
-const ELEMENT_MODULES = { clock, battery, money, stars, weapon, minimap, iframe };
+const ELEMENT_MODULES = { clock, battery, money, stars, weapon, minimap, iframe, watermark };
 const TYPE_LABELS = {
   clock: "Horloge (+ barres)",
   battery: "Batterie / Temp",
@@ -19,6 +21,7 @@ const TYPE_LABELS = {
   weapon: "Arme",
   minimap: "Mini map",
   iframe: "Widget externe (URL)",
+  watermark: "Filigrane (PNG)",
 };
 const MULTI_INSTANCE_TYPES = new Set(["iframe", "battery"]);
 
@@ -29,6 +32,7 @@ const DEFAULT_ELEMENTS = [
   { id: "money", type: "money", x: 1630, y: 165, scale: 1, visible: true },
   { id: "weapon", type: "weapon", x: 1720, y: 860, scale: 1, visible: true },
   { id: "minimap", type: "minimap", x: 40, y: 720, scale: 1, visible: true },
+  { id: "watermark", type: "watermark", x: 830, y: 20, scale: 1, visible: true },
 ];
 
 const stage = document.getElementById("canvas-stage");
@@ -428,6 +432,38 @@ function renderElementList() {
         renderCanvas();
       });
       row.appendChild(deviceSelect);
+    }
+
+    if (el.type === "watermark") {
+      const fileInput = document.createElement("input");
+      fileInput.type = "file";
+      fileInput.accept = "image/png";
+      row.appendChild(fileInput);
+
+      const btnUpload = document.createElement("button");
+      btnUpload.textContent = "Uploader";
+      btnUpload.className = "primary";
+      btnUpload.addEventListener("click", async () => {
+        const file = fileInput.files[0];
+        if (!file) return;
+        const storageRef = ref(storage, "watermark/watermark.png");
+        await uploadBytes(storageRef, file);
+        const url = await getDownloadURL(storageRef);
+        el.url = url;
+        persistElements();
+        renderCanvas();
+        renderElementList();
+      });
+      row.appendChild(btnUpload);
+
+      if (el.url) {
+        const preview = document.createElement("img");
+        preview.src = el.url;
+        preview.style.height = "32px";
+        preview.style.background = "#000";
+        preview.style.borderRadius = "4px";
+        row.appendChild(preview);
+      }
     }
 
     const btnVisible = document.createElement("button");
