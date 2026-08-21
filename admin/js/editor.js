@@ -362,8 +362,21 @@ function renderElementList() {
 
     const name = document.createElement("div");
     name.className = "element-row__name";
-    name.textContent = TYPE_LABELS[el.type] || el.type;
+    name.textContent = el.label || TYPE_LABELS[el.type] || el.type;
     row.appendChild(name);
+
+    if (MULTI_INSTANCE_TYPES.has(el.type)) {
+      const labelInput = document.createElement("input");
+      labelInput.type = "text";
+      labelInput.placeholder = "nom (ex: Vote Giveaway)";
+      labelInput.value = el.label || "";
+      labelInput.addEventListener("change", () => {
+        el.label = labelInput.value.trim();
+        persistElements();
+        renderElementList();
+      });
+      row.appendChild(labelInput);
+    }
 
     const coords = document.createElement("div");
     coords.className = "element-row__coords";
@@ -419,15 +432,17 @@ function renderElementList() {
       });
       row.appendChild(urlInput);
 
-      const btnDemo = document.createElement("button");
-      btnDemo.textContent = isDemoEnabled(el.url) ? "Démo : ON" : "Démo : OFF";
-      btnDemo.addEventListener("click", () => {
-        el.url = toggleDemoParam(el.url || "");
-        persistElements();
-        renderCanvas();
-        renderElementList();
-      });
-      row.appendChild(btnDemo);
+      if (el.demo !== false) {
+        const btnDemo = document.createElement("button");
+        btnDemo.textContent = isDemoEnabled(el.url) ? "Démo : ON" : "Démo : OFF";
+        btnDemo.addEventListener("click", () => {
+          el.url = toggleDemoParam(el.url || "");
+          persistElements();
+          renderCanvas();
+          renderElementList();
+        });
+        row.appendChild(btnDemo);
+      }
 
       const sizeWrap = document.createElement("div");
       sizeWrap.className = "element-row__coords";
