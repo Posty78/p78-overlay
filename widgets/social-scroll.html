@@ -15,21 +15,20 @@ html, body {
   height: 100%;
   overflow: hidden;
   position: relative;
-  display: flex;
-  align-items: center;
 }
 .track {
   display: flex;
-  align-items: center;
-  white-space: nowrap;
-  animation: scroll-left 78s linear infinite;
+  flex-direction: column;
+  animation: scroll-up 78s linear infinite;
   will-change: transform;
 }
 .card {
   display: flex;
   align-items: center;
+  justify-content: center;
   gap: 14px;
-  padding: 0 36px;
+  width: 100%;
+  height: var(--card-h, 90px);
   flex-shrink: 0;
 }
 .card img {
@@ -54,9 +53,9 @@ html, body {
      2px  0px 0 #000,
     -2px  0px 0 #000;
 }
-@keyframes scroll-left {
-  from { transform: translateX(0); }
-  to   { transform: translateX(-50%); }
+@keyframes scroll-up {
+  from { transform: translateY(0); }
+  to   { transform: translateY(-50%); }
 }
 </style>
 </head>
@@ -65,6 +64,8 @@ html, body {
   <div class="track" id="track"></div>
 </div>
 <script>
+document.documentElement.style.setProperty('--card-h', window.innerHeight + 'px');
+
 const socials = [
   { url: 'kick.com/Posty78',          logo: 'https://www.google.com/s2/favicons?domain=kick.com&sz=64' },
   { url: 'tiktok.com/@kick.posty78',  logo: 'https://www.google.com/s2/favicons?domain=tiktok.com&sz=64' },
@@ -84,7 +85,7 @@ function buildCard(s) {
   return c;
 }
 
-// Liste dupliquée deux fois pour une boucle parfaitement continue (translateX(-50%)).
+// Liste dupliquée deux fois pour une boucle parfaitement continue (translateY(-50%)).
 [...socials, ...socials].forEach(s => track.appendChild(buildCard(s)));
 </script>
 </body>
