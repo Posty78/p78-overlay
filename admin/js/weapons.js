@@ -13,6 +13,7 @@ let knownCommands = new Set();
 export async function initWeapons() {
   await refreshWeaponList();
   form.addEventListener("submit", onSubmit);
+  document.getElementById("btn-weapon-clear").addEventListener("click", () => onShowManually(null));
 }
 
 async function refreshWeaponList() {
@@ -34,6 +35,12 @@ async function refreshWeaponList() {
     cmd.className = "weapon-row__cmd";
     cmd.textContent = `!${docSnap.id}`;
     row.appendChild(cmd);
+
+    const btnShow = document.createElement("button");
+    btnShow.textContent = "Afficher";
+    btnShow.className = "primary";
+    btnShow.addEventListener("click", () => onShowManually(data.imageUrl));
+    row.appendChild(btnShow);
 
     const btnDelete = document.createElement("button");
     btnDelete.textContent = "Suppr.";
@@ -83,6 +90,14 @@ async function onSubmit(e) {
 
   form.reset();
   await refreshWeaponList();
+}
+
+async function onShowManually(imageUrl) {
+  await setDoc(
+    doc(db, "state", "gta"),
+    { weaponImageUrl: imageUrl, weaponUpdatedAt: serverTimestamp() },
+    { merge: true }
+  );
 }
 
 async function onDelete(command) {

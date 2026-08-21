@@ -28,11 +28,11 @@ service cloud.firestore {
       allow write: if isAdmin();
     }
 
-    // Etat piloté par le chat (argent/étoiles/arme) : lecture publique, écriture uniquement
-    // via les Cloud Functions (Admin SDK, contourne ces règles). Aucune écriture client directe.
+    // Etat piloté par le chat (argent/étoiles/arme) : lecture publique. Ecriture via les
+    // Cloud Functions (chat, contourne ces règles) OU directement par un admin (panel).
     match /state/{docId} {
       allow read: if true;
-      allow write: if false;
+      allow write: if isAdmin();
     }
   }
 }
