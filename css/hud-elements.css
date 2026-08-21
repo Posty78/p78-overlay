@@ -49,8 +49,8 @@
 /* --- Etoiles --- */
 .hud-stars { display: flex; gap: 6px; }
 .hud-stars svg { width: 48px; height: 48px; filter: drop-shadow(0 0 3px rgba(0,0,0,0.9)); }
-.hud-star--on { fill: #ffcc00; stroke: #000; stroke-width: 5px; stroke-linejoin: round; }
-.hud-star--off { fill: rgba(255,255,255,0.12); stroke: #000; stroke-width: 5px; stroke-linejoin: round; }
+.hud-star--on { fill: #ffcc00; stroke: #000; stroke-width: 2.5px; stroke-linejoin: round; }
+.hud-star--off { fill: rgba(255,255,255,0.12); stroke: #000; stroke-width: 2.5px; stroke-linejoin: round; }
 
 /* --- Barre blanche/rouge (décorative, style vie/armure) --- */
 .hud-healthbar {
