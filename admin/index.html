@@ -49,6 +49,31 @@
       </section>
 
       <section class="panel">
+        <h2>Argent / Étoiles (manuel)</h2>
+        <div class="state-row">
+          <span>Argent : <strong id="state-money-display">$0</strong></span>
+        </div>
+        <div class="state-row">
+          <button data-money-delta="-100">-100</button>
+          <button data-money-delta="-50">-50</button>
+          <button data-money-delta="50">+50</button>
+          <button data-money-delta="100">+100</button>
+        </div>
+        <div class="state-row">
+          <input type="number" id="money-set-input" placeholder="valeur exacte">
+          <button id="btn-money-set">Définir</button>
+        </div>
+        <div class="state-row" style="margin-top:12px;">
+          <span>Étoiles : <strong id="state-stars-display">0</strong> / 6</span>
+        </div>
+        <div class="state-row">
+          <button id="btn-stars-minus">− 1</button>
+          <button id="btn-stars-plus">+ 1</button>
+          <button id="btn-stars-zero">Remettre à 0</button>
+        </div>
+      </section>
+
+      <section class="panel">
         <h2>Armes (mapping commande → PNG)</h2>
         <div id="weapon-list"></div>
         <form id="weapon-upload-form">

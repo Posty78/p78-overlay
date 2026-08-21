@@ -2,6 +2,7 @@ import { initAuth } from "./auth.js";
 import { initEditor } from "./editor.js";
 import { initWeapons } from "./weapons.js";
 import { initReset } from "./reset.js";
+import { initState } from "./state.js";
 
 let started = false;
 
@@ -11,4 +12,5 @@ initAuth(() => {
   initEditor();
   initWeapons();
   initReset();
+  initState();
 });

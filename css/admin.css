@@ -184,6 +184,15 @@ section.panel h2 {
   margin-top: 10px;
 }
 
+.state-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  flex-wrap: wrap;
+}
+.state-row input[type="number"] { width: 100px; }
+
 .hint { font-size: 12px; color: #9aa0ac; }
 .warn { font-size: 12px; color: #f5a623; }
 
