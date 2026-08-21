@@ -167,6 +167,12 @@ function setElementPosition(id, x, y) {
   el.y = Math.round(y);
 }
 
+function setElementScale(id, scale) {
+  const el = currentElements.find((e) => e.id === id);
+  if (!el) return;
+  el.scale = Math.max(0.2, Math.min(4, scale));
+}
+
 async function persistElements() {
   if (!currentSceneId) return;
   await updateDoc(doc(db, "scenes", currentSceneId), { elements: currentElements });
@@ -292,6 +298,23 @@ function renderElementList() {
     coords.appendChild(document.createTextNode("y:"));
     coords.appendChild(yInput);
     row.appendChild(coords);
+
+    const scaleWrap = document.createElement("div");
+    scaleWrap.className = "element-row__coords";
+    const scaleInput = document.createElement("input");
+    scaleInput.type = "number";
+    scaleInput.min = "0.2";
+    scaleInput.max = "4";
+    scaleInput.step = "0.1";
+    scaleInput.value = el.scale ?? 1;
+    scaleInput.addEventListener("change", () => {
+      setElementScale(el.id, Number(scaleInput.value));
+      persistElements();
+      renderCanvas();
+    });
+    scaleWrap.appendChild(document.createTextNode("taille:"));
+    scaleWrap.appendChild(scaleInput);
+    row.appendChild(scaleWrap);
 
     const btnVisible = document.createElement("button");
     btnVisible.textContent = el.visible === false ? "Afficher" : "Masquer";
