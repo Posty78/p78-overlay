@@ -8,17 +8,15 @@ import * as money from "../../js/elements/money.js";
 import * as stars from "../../js/elements/stars.js";
 import * as weapon from "../../js/elements/weapon.js";
 import * as minimap from "../../js/elements/minimap.js";
-import * as healthbar from "../../js/elements/healthbar.js";
 
-const ELEMENT_MODULES = { clock, battery, money, stars, weapon, minimap, healthbar };
+const ELEMENT_MODULES = { clock, battery, money, stars, weapon, minimap };
 const TYPE_LABELS = {
-  clock: "Horloge",
+  clock: "Horloge (+ barres)",
   battery: "Batterie / Temp",
   money: "Argent",
   stars: "Étoiles",
   weapon: "Arme",
   minimap: "Mini map",
-  healthbar: "Barre vie/armure",
 };
 
 const DEFAULT_ELEMENTS = [
@@ -28,7 +26,6 @@ const DEFAULT_ELEMENTS = [
   { id: "money", type: "money", x: 1630, y: 165, scale: 1, visible: true },
   { id: "weapon", type: "weapon", x: 1720, y: 860, scale: 1, visible: true },
   { id: "minimap", type: "minimap", x: 40, y: 720, scale: 1, visible: true },
-  { id: "healthbar", type: "healthbar", x: 1630, y: 210, scale: 1, visible: true },
 ];
 
 const stage = document.getElementById("canvas-stage");

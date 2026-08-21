@@ -1,14 +1,22 @@
 /* Styles des éléments HUD, partagés entre l'overlay OBS et l'éditeur admin. */
 
-/* --- Horloge --- */
+/* --- Horloge (+ barres vie/armure fusionnées en dessous) --- */
+.hud-clock-group {
+  width: 140px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 4px;
+}
 .hud-clock {
   font-family: "Anton", sans-serif;
-  font-size: 64px;
+  font-size: 36px;
   color: #ffffff;
+  text-align: center;
   letter-spacing: 1px;
   text-shadow:
-    3px 0 0 #000, -3px 0 0 #000, 0 3px 0 #000, 0 -3px 0 #000,
-    2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000;
+    2px 0 0 #000, -2px 0 0 #000, 0 2px 0 #000, 0 -2px 0 #000,
+    1px 1px 0 #000, -1px -1px 0 #000, 1px -1px 0 #000, -1px 1px 0 #000;
 }
 
 /* --- Batterie / température --- */
