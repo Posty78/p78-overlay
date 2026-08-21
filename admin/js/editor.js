@@ -374,7 +374,7 @@ function renderElementList() {
     header.appendChild(name);
 
     const btnVisible = document.createElement("button");
-    btnVisible.className = "icon-btn";
+    btnVisible.className = "icon-btn " + (el.visible === false ? "icon-btn--off" : "icon-btn--on");
     btnVisible.title = el.visible === false ? "Afficher" : "Masquer";
     btnVisible.textContent = el.visible === false ? "◌" : "●";
     btnVisible.addEventListener("click", () => toggleVisible(el.id));

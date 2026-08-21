@@ -3,11 +3,17 @@
 html, body {
   margin: 0;
   min-height: 100vh;
-  background: #101216;
+  background: #0d0e11;
+  background-image: radial-gradient(ellipse 900px 500px at 20% -10%, rgba(59,130,246,0.06), transparent);
   color: #e8e8ec;
   font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
   font-size: 14px;
 }
+
+::-webkit-scrollbar { width: 10px; height: 10px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #2c2f37; border-radius: 6px; border: 2px solid #101216; }
+::-webkit-scrollbar-thumb:hover { background: #3a3e47; }
 
 button {
   font: inherit;
@@ -50,10 +56,13 @@ input:focus, select:focus { outline: 1.5px solid #3b82f6; border-color: #3b82f6;
   flex-direction: column;
   gap: 12px;
   width: 280px;
-  padding: 24px;
-  background: #1d1f24;
-  border-radius: 10px;
+  padding: 28px;
+  background: #16181d;
+  border: 1px solid #23262d;
+  border-radius: 14px;
+  box-shadow: 0 10px 40px rgba(0,0,0,0.4);
 }
+#login-form h2 { color: #4ade80; }
 #login-error { color: #ff6b6b; font-size: 14px; min-height: 18px; }
 
 /* --- App layout --- */
@@ -67,8 +76,12 @@ input:focus, select:focus { outline: 1.5px solid #3b82f6; border-color: #3b82f6;
   padding: 10px 16px;
   background: #15171c;
   border-bottom: 1px solid #23262d;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.25);
+  position: relative;
+  z-index: 2;
 }
 #topbar .scenes { display: flex; align-items: center; gap: 8px; }
+#topbar select { min-width: 90px; }
 
 #main {
   flex: 1;
@@ -153,10 +166,11 @@ input:focus, select:focus { outline: 1.5px solid #3b82f6; border-color: #3b82f6;
 /* --- Panels catégorisés --- */
 section.panel {
   --accent: #3b82f6;
-  background: #16181d;
+  background: #15171b;
   border: 1px solid #23262d;
-  border-radius: 10px;
+  border-radius: 12px;
   padding: 12px;
+  box-shadow: 0 1px 0 rgba(255,255,255,0.02) inset, 0 4px 14px rgba(0,0,0,0.18);
 }
 .panel--elements { --accent: #3b82f6; }
 .panel--state    { --accent: #22c55e; }
@@ -191,8 +205,9 @@ section.panel h2::before {
   border-radius: 8px;
   margin-bottom: 6px;
   overflow: hidden;
+  transition: border-color 120ms ease, background 120ms ease;
 }
-.element-row:hover { border-color: #333844; }
+.element-row:hover { border-color: #3a3e47; background: #1d1f26; }
 
 .element-row__header {
   display: flex;
@@ -220,11 +235,15 @@ section.panel h2::before {
   align-items: center;
   justify-content: center;
   font-size: 13px;
-  background: #262a31;
+  background: #21242b;
   color: #b7bdc6;
+  border-radius: 7px;
 }
 .icon-btn:hover { background: #333844; color: #fff; }
+.icon-btn--danger { color: #e5717a; }
 .icon-btn--danger:hover { background: #7f1d1d; color: #fff; }
+.icon-btn--on { color: #4ade80; }
+.icon-btn--off { color: #575c65; }
 
 .element-row__details {
   display: none;
