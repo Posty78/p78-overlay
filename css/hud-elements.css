@@ -35,7 +35,7 @@
 
 .hud-icon { display: block; filter: drop-shadow(0 0 3px rgba(0,0,0,0.9)); }
 .hud-icon--battery { width: 52px; height: 32px; }
-.hud-icon--temp { width: 38px; height: 46px; }
+.hud-icon--temp { width: 52px; height: 32px; }
 
 .hud-icon__body { fill: none; stroke: #ffffff; stroke-width: 2px; stroke-linejoin: round; }
 .hud-icon__nub  { fill: #ffffff; }
