@@ -1,6 +1,6 @@
 import { doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import { mapsDb } from "../firebase-init.js";
-import { TRACKING_POSITION_DOC, FUNCTIONS_BASE_URL } from "../config.js";
+import { mapsDb } from "../firebase-init.js?v=1";
+import { TRACKING_POSITION_DOC, FUNCTIONS_BASE_URL } from "../config.js?v=1";
 
 const REFRESH_INTERVAL_MS = 10 * 60 * 1000; // 10 min : la météo change lentement, inutile d'appeler plus souvent
 

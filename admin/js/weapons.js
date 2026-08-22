@@ -1,6 +1,6 @@
 import { collection, doc, getDocs, setDoc, deleteDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
-import { db, storage } from "../../js/firebase-init.js";
+import { db, storage } from "../../js/firebase-init.js?v=1";
 
 const weaponList = document.getElementById("weapon-list");
 const form = document.getElementById("weapon-upload-form");

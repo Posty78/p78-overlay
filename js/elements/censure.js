@@ -1,5 +1,5 @@
 import { doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import { db } from "../firebase-init.js";
+import { db } from "../firebase-init.js?v=1";
 
 // Masque de censure plein écran, piloté par !censureon / !censureoff dans le
 // chat (modérateur uniquement, filtré côté bot Botsty78). Volontairement HORS

@@ -1,10 +1,10 @@
-import { initAuth } from "./auth.js";
-import { initEditor } from "./editor.js";
-import { initWeapons } from "./weapons.js";
-import { initReset } from "./reset.js";
-import { initState } from "./state.js";
-import { initCensure } from "./censure.js";
-import { initWidgets } from "./widgets.js";
+import { initAuth } from "./auth.js?v=1";
+import { initEditor } from "./editor.js?v=1";
+import { initWeapons } from "./weapons.js?v=1";
+import { initReset } from "./reset.js?v=1";
+import { initState } from "./state.js?v=1";
+import { initCensure } from "./censure.js?v=1";
+import { initWidgets } from "./widgets.js?v=1";
 
 let started = false;
 

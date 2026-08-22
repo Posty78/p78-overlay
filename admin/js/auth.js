@@ -3,8 +3,8 @@ import {
   onAuthStateChanged,
   signOut,
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
-import { auth } from "../../js/firebase-init.js";
-import { ADMIN_UIDS } from "../../js/config.js";
+import { auth } from "../../js/firebase-init.js?v=1";
+import { ADMIN_UIDS } from "../../js/config.js?v=1";
 
 const loginScreen = document.getElementById("login-screen");
 const appScreen = document.getElementById("app-screen");

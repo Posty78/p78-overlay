@@ -1,5 +1,5 @@
-import { FUNCTIONS_BASE_URL } from "../../js/config.js";
-import { getIdToken } from "./auth.js";
+import { FUNCTIONS_BASE_URL } from "../../js/config.js?v=1";
+import { getIdToken } from "./auth.js?v=1";
 
 export function initReset() {
   document.getElementById("btn-reset").addEventListener("click", onReset);

@@ -1,6 +1,6 @@
 import { doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import { mapsDb } from "../firebase-init.js";
-import { GOOGLE_MAPS_API_KEY, TRACKING_POSITION_DOC } from "../config.js";
+import { mapsDb } from "../firebase-init.js?v=1";
+import { GOOGLE_MAPS_API_KEY, TRACKING_POSITION_DOC } from "../config.js?v=1";
 
 let apiLoadPromise = null;
 

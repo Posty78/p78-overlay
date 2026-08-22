@@ -2,16 +2,16 @@ import {
   collection, doc, getDocs, getDoc, setDoc, updateDoc, onSnapshot,
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
-import { db, storage } from "../../js/firebase-init.js";
-import * as clock from "../../js/elements/clock.js";
-import * as battery from "../../js/elements/battery.js";
-import * as money from "../../js/elements/money.js";
-import * as stars from "../../js/elements/stars.js";
-import * as weapon from "../../js/elements/weapon.js";
-import * as minimap from "../../js/elements/minimap.js";
-import * as iframe from "../../js/elements/iframe.js";
-import * as watermark from "../../js/elements/watermark.js";
-import * as weather from "../../js/elements/weather.js";
+import { db, storage } from "../../js/firebase-init.js?v=1";
+import * as clock from "../../js/elements/clock.js?v=1";
+import * as battery from "../../js/elements/battery.js?v=1";
+import * as money from "../../js/elements/money.js?v=1";
+import * as stars from "../../js/elements/stars.js?v=1";
+import * as weapon from "../../js/elements/weapon.js?v=1";
+import * as minimap from "../../js/elements/minimap.js?v=1";
+import * as iframe from "../../js/elements/iframe.js?v=1";
+import * as watermark from "../../js/elements/watermark.js?v=1";
+import * as weather from "../../js/elements/weather.js?v=1";
 
 const ELEMENT_MODULES = { clock, battery, money, stars, weapon, minimap, iframe, watermark, weather };
 const TYPE_LABELS = {

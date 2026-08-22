@@ -1,6 +1,6 @@
 import { doc, onSnapshot, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
-import { db, storage } from "../../js/firebase-init.js";
+import { db, storage } from "../../js/firebase-init.js?v=1";
 
 const censureRef = doc(db, "state", "censure");
 

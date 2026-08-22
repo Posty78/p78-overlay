@@ -1,6 +1,6 @@
 import { ref, onValue } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-import { mapsRtdb } from "../firebase-init.js";
-import { DEVICE_RTDB_PATHS } from "../config.js";
+import { mapsRtdb } from "../firebase-init.js?v=1";
+import { DEVICE_RTDB_PATHS } from "../config.js?v=1";
 
 // Paliers de couleur (indépendants de la charge en cours pour la batterie :
 // le %% réel prime, la charge n'est signalée qu'en plus via un badge éclair).

@@ -1,15 +1,15 @@
 import { doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import { db } from "./firebase-init.js";
-import * as clock from "./elements/clock.js";
-import * as battery from "./elements/battery.js";
-import * as money from "./elements/money.js";
-import * as stars from "./elements/stars.js";
-import * as weapon from "./elements/weapon.js";
-import * as minimap from "./elements/minimap.js";
-import * as iframe from "./elements/iframe.js";
-import * as watermark from "./elements/watermark.js";
-import * as weather from "./elements/weather.js";
-import { mountCensure } from "./elements/censure.js";
+import { db } from "./firebase-init.js?v=1";
+import * as clock from "./elements/clock.js?v=1";
+import * as battery from "./elements/battery.js?v=1";
+import * as money from "./elements/money.js?v=1";
+import * as stars from "./elements/stars.js?v=1";
+import * as weapon from "./elements/weapon.js?v=1";
+import * as minimap from "./elements/minimap.js?v=1";
+import * as iframe from "./elements/iframe.js?v=1";
+import * as watermark from "./elements/watermark.js?v=1";
+import * as weather from "./elements/weather.js?v=1";
+import { mountCensure } from "./elements/censure.js?v=1";
 
 const ELEMENTS = { clock, battery, money, stars, weapon, minimap, iframe, watermark, weather };
 

@@ -1,5 +1,5 @@
 import { doc, onSnapshot, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import { db } from "../../js/firebase-init.js";
+import { db } from "../../js/firebase-init.js?v=1";
 
 const widgetsRef = doc(db, "state", "widgets");
 

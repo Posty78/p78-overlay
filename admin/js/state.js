@@ -1,7 +1,7 @@
 import {
   doc, onSnapshot, setDoc, increment,
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
-import { db } from "../../js/firebase-init.js";
+import { db } from "../../js/firebase-init.js?v=1";
 
 const STARS_MAX = 6;
 const stateRef = doc(db, "state", "gta");
