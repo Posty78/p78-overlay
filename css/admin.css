@@ -32,6 +32,7 @@ button.primary { background: #3b82f6; color: #fff; }
 button.primary:hover { background: #2563eb; }
 button.danger { background: #7f1d1d; color: #fff; }
 button.danger:hover { background: #991b1b; }
+.hint.danger { color: #ef4444; font-weight: 700; }
 
 input, select {
   font: inherit;
@@ -175,6 +176,7 @@ section.panel {
 .panel--elements { --accent: #3b82f6; }
 .panel--state    { --accent: #22c55e; }
 .panel--weapons  { --accent: #f97316; }
+.panel--censure  { --accent: #ef4444; }
 
 section.panel h2 {
   display: flex;

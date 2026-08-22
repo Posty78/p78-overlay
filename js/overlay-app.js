@@ -9,8 +9,12 @@ import * as minimap from "./elements/minimap.js";
 import * as iframe from "./elements/iframe.js";
 import * as watermark from "./elements/watermark.js";
 import * as weather from "./elements/weather.js";
+import { mountCensure } from "./elements/censure.js";
 
 const ELEMENTS = { clock, battery, money, stars, weapon, minimap, iframe, watermark, weather };
+
+// Hors systeme de scenes expres : doit pouvoir masquer n'importe quelle scene active.
+mountCensure();
 
 const stage = document.getElementById("stage");
 let mountedNodes = {}; // elementId -> { node, type }

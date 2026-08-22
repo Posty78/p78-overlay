@@ -27,3 +27,23 @@ html, body {
 .hud-el[data-visible="false"] {
   display: none;
 }
+
+/* Masque de censure : toujours au-dessus de tout (stage + tous les hud-el),
+   quelle que soit la scène active. Caché par défaut, visible uniquement
+   quand state/censure.visible est vrai ET qu'une image est configurée. */
+.censure-mask {
+  position: absolute;
+  inset: 0;
+  width: 1920px;
+  height: 1080px;
+  z-index: 999999;
+  display: none;
+  background: #000;
+}
+.censure-mask.is-visible { display: block; }
+.censure-mask img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}

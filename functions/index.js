@@ -73,6 +73,21 @@ exports.commandWebhook = onRequest(
         return;
       }
 
+      // Masque de censure plein écran (!censureon / !censureoff) - doc separe de
+      // "state/gta" expres, pour ne jamais etre touche par resetState (qui ne
+      // reinitialise que argent/etoiles/arme).
+      if (command === "censureon" || command === "censureoff") {
+        await db.collection("state").doc("censure").set(
+          {
+            visible: command === "censureon",
+            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+          },
+          { merge: true }
+        );
+        res.json({ ok: true, command });
+        return;
+      }
+
       // Sinon : la commande est un nom d'arme mappé dans la collection "weapons" via le panel admin.
       const weaponSnap = await db.collection("weapons").doc(command).get();
       if (!weaponSnap.exists) {

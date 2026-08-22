@@ -70,6 +70,23 @@
         </div>
       </section>
 
+      <section class="panel panel--censure">
+        <h2>Masque de censure</h2>
+        <div id="censure-status" class="hint">—</div>
+        <img id="censure-preview" style="display:none; width:100%; border-radius:6px; margin:8px 0;">
+        <form id="censure-upload-form">
+          <input type="file" id="censure-file" accept="image/png" required>
+          <div id="censure-upload-warning" class="warn"></div>
+          <button type="submit" class="primary">Uploader / remplacer</button>
+        </form>
+        <div class="hint">PNG plein écran (1920×1080 recommandé), opaque de préférence.</div>
+        <div class="state-row" style="margin-top:8px;">
+          <button id="btn-censure-show" class="danger">Afficher (test)</button>
+          <button id="btn-censure-hide">Masquer (test)</button>
+        </div>
+        <div class="hint">Piloté en direct par !censureon / !censureoff dans le chat (modérateurs).</div>
+      </section>
+
       <section class="panel panel--weapons">
         <h2>Armes</h2>
         <div id="weapon-list"></div>

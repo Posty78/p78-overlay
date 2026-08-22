@@ -3,6 +3,7 @@ import { initEditor } from "./editor.js";
 import { initWeapons } from "./weapons.js";
 import { initReset } from "./reset.js";
 import { initState } from "./state.js";
+import { initCensure } from "./censure.js";
 
 let started = false;
 
@@ -13,4 +14,5 @@ initAuth(() => {
   initWeapons();
   initReset();
   initState();
+  initCensure();
 });
