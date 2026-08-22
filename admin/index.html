@@ -70,6 +70,22 @@
         </div>
       </section>
 
+      <section class="panel panel--widgets">
+        <h2>Visibilité (commandes chat)</h2>
+        <div id="maps-status" class="hint">—</div>
+        <div class="state-row">
+          <button id="btn-maps-hide" class="danger">!mapsoff (test)</button>
+          <button id="btn-maps-show">!mapson (test)</button>
+        </div>
+        <div class="hint">Masque la mini map + la météo, quelle que soit la scène.</div>
+        <div id="overlay-status" class="hint" style="margin-top:10px;">—</div>
+        <div class="state-row">
+          <button id="btn-overlay-hide" class="danger">!overlayoff (test)</button>
+          <button id="btn-overlay-show">!overlayon (test)</button>
+        </div>
+        <div class="hint">Masque TOUT l'overlay d'un coup. Indépendant de !mapsoff : !overlayon ne réaffiche pas la map/météo si elle était masquée par !mapsoff.</div>
+      </section>
+
       <section class="panel panel--censure">
         <h2>Masque de censure</h2>
         <div id="censure-status" class="hint">—</div>

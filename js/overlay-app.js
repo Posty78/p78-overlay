@@ -22,6 +22,11 @@ let latestGtaState = {};
 let currentSceneId = null;
 let unsubScene = null;
 
+// Types masqués par !mapsoff (mini map + météo), independamment de leur
+// visibilite propre configuree dans la scene.
+const MAPS_WIDGET_TYPES = new Set(["minimap", "weather"]);
+let mapsHidden = false;
+
 onSnapshot(doc(db, "settings", "active"), (snap) => {
   const activeSceneId = snap.data()?.activeSceneId;
   if (!activeSceneId || activeSceneId === currentSceneId) return;
@@ -32,6 +37,16 @@ onSnapshot(doc(db, "settings", "active"), (snap) => {
 onSnapshot(doc(db, "state", "gta"), (snap) => {
   latestGtaState = snap.data() || {};
   applyGtaStateToMounted();
+});
+
+// !mapson/!mapsoff (mini map + météo) et !overlayon/!overlayoff (tout le
+// stage) - volontairement independants l'un de l'autre : !overlayon ne leve
+// que son propre masquage, jamais celui pose par !mapsoff (cf. discussion).
+onSnapshot(doc(db, "state", "widgets"), (snap) => {
+  const data = snap.data() || {};
+  stage.style.display = data.allHidden ? "none" : "";
+  mapsHidden = !!data.mapsHidden;
+  applyMapsHiddenToMounted();
 });
 
 function watchScene(sceneId) {
@@ -73,6 +88,7 @@ function renderScene(elements) {
   }
 
   applyGtaStateToMounted();
+  applyMapsHiddenToMounted();
 }
 
 function positionNode(node, elConfig) {
@@ -86,5 +102,13 @@ function applyGtaStateToMounted() {
   for (const { node, type } of Object.values(mountedNodes)) {
     const module = ELEMENTS[type];
     if (module.update) module.update(node, latestGtaState);
+  }
+}
+
+function applyMapsHiddenToMounted() {
+  for (const { node, type } of Object.values(mountedNodes)) {
+    if (MAPS_WIDGET_TYPES.has(type)) {
+      node.dataset.forceHidden = mapsHidden ? "true" : "false";
+    }
   }
 }

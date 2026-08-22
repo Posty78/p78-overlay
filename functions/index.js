@@ -88,6 +88,35 @@ exports.commandWebhook = onRequest(
         return;
       }
 
+      // Masquage cible (mini map + météo) et masquage global (tout le stage) -
+      // doc separe encore une fois, independant de censure/gta/resetState. Les
+      // deux drapeaux sont volontairement independants l'un de l'autre (voir
+      // mapsHidden vs allHidden cote overlay) : !overlayon ne leve QUE son
+      // propre masquage, jamais celui pose par !mapsoff.
+      if (command === "mapson" || command === "mapsoff") {
+        await db.collection("state").doc("widgets").set(
+          {
+            mapsHidden: command === "mapsoff",
+            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+          },
+          { merge: true }
+        );
+        res.json({ ok: true, command });
+        return;
+      }
+
+      if (command === "overlayon" || command === "overlayoff") {
+        await db.collection("state").doc("widgets").set(
+          {
+            allHidden: command === "overlayoff",
+            updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+          },
+          { merge: true }
+        );
+        res.json({ ok: true, command });
+        return;
+      }
+
       // Sinon : la commande est un nom d'arme mappé dans la collection "weapons" via le panel admin.
       const weaponSnap = await db.collection("weapons").doc(command).get();
       if (!weaponSnap.exists) {

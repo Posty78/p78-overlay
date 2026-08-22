@@ -177,6 +177,7 @@ section.panel {
 .panel--state    { --accent: #22c55e; }
 .panel--weapons  { --accent: #f97316; }
 .panel--censure  { --accent: #ef4444; }
+.panel--widgets  { --accent: #06b6d4; }
 
 section.panel h2 {
   display: flex;

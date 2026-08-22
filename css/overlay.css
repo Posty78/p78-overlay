@@ -28,6 +28,13 @@ html, body {
   display: none;
 }
 
+/* !mapsoff : masque mini map + météo indépendamment de leur visibilité propre
+   configurée dans la scène (les deux drapeaux se cumulent, l'un des deux
+   suffit à masquer). */
+.hud-el[data-force-hidden="true"] {
+  display: none !important;
+}
+
 /* Masque de censure : toujours au-dessus de tout (stage + tous les hud-el),
    quelle que soit la scène active. Caché par défaut, visible uniquement
    quand state/censure.visible est vrai ET qu'une image est configurée. */

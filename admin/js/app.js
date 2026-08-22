@@ -4,6 +4,7 @@ import { initWeapons } from "./weapons.js";
 import { initReset } from "./reset.js";
 import { initState } from "./state.js";
 import { initCensure } from "./censure.js";
+import { initWidgets } from "./widgets.js";
 
 let started = false;
 
@@ -15,4 +16,5 @@ initAuth(() => {
   initReset();
   initState();
   initCensure();
+  initWidgets();
 });
