@@ -29,17 +29,24 @@ const BATTERY_ICON = `
   </svg>
 `;
 
-// Vrai thermomètre classique couché à l'horizontale : tige fine (cercle rayon 4,
-// centre 7,12) reliée à un bulbe (cercle rayon 8, centre 30,12) par deux vraies
-// tangentes externes (calcul géométrique, pas une approximation à l'oeil) - un
-// seul tracé continu pour le contour ET le remplissage, donc aucun risque de
-// décalage entre les deux comme sur les versions précédentes.
-const TEMP_SILHOUETTE =
-  "M6.31,8.06 A4,4 0 0,0 6.31,15.94 L28.61,19.88 A8,8 0 1,0 28.61,4.12 Z";
+// Thermomètre classique à mercure, couché à l'horizontale : tige fine avec
+// graduations + bulbe rond nettement plus gros au bout (comme un vrai
+// thermomètre en verre). Construction simple (un rectangle + un cercle,
+// pas d'arc calculé à la main) : un fond blanc plein (tige+bulbe) sert de
+// silhouette/contour, une version plus petite du même duo rect+cercle posée
+// par-dessus fait office de "mercure" coloré, et les graduations sont de
+// simples traits noirs par-dessus - aucune géométrie fragile, donc aucun
+// risque de défaut de remplissage.
 const TEMP_ICON = `
   <svg class="hud-icon hud-icon--temp" viewBox="0 0 40 24" xmlns="http://www.w3.org/2000/svg">
-    <path class="hud-temp__fill" d="${TEMP_SILHOUETTE}"/>
-    <path class="hud-icon__body" fill="none" d="${TEMP_SILHOUETTE}"/>
+    <rect class="hud-icon__body-bg" x="2" y="8.5" width="21" height="7" rx="3.5"/>
+    <circle class="hud-icon__body-bg" cx="30" cy="12" r="9"/>
+    <rect class="hud-temp__fill" x="4.5" y="10.5" width="22" height="3" rx="1.5"/>
+    <circle class="hud-temp__fill" cx="30" cy="12" r="6.5"/>
+    <line class="hud-temp__tick" x1="6" y1="6.5" x2="6" y2="17.5"/>
+    <line class="hud-temp__tick" x1="10" y1="6.5" x2="10" y2="17.5"/>
+    <line class="hud-temp__tick" x1="14" y1="6.5" x2="14" y2="17.5"/>
+    <line class="hud-temp__tick" x1="18" y1="6.5" x2="18" y2="17.5"/>
   </svg>
 `;
 
@@ -62,7 +69,7 @@ export function create(elConfig) {
 
   const batteryFill = el.querySelector(".hud-battery__fill");
   const chargeIcon = el.querySelector(".hud-battery__charge");
-  const tempFill = el.querySelector(".hud-temp__fill");
+  const tempFillShapes = el.querySelectorAll(".hud-temp__fill");
   const batteryText = el.querySelector('[data-role="battery-text"]');
   const tempText = el.querySelector('[data-role="temp-text"]');
   const batteryItem = el.querySelector('[data-role="battery"]');
@@ -90,7 +97,9 @@ export function create(elConfig) {
       tempText.textContent = `${Math.round(temp)}°C`;
 
       const level = levelClass(temp, TEMP_WARM, TEMP_HIGH, true);
-      tempFill.setAttribute("class", `hud-temp__fill hud-temp__fill--${level}`);
+      tempFillShapes.forEach((shape) =>
+        shape.setAttribute("class", `hud-temp__fill hud-temp__fill--${level}`)
+      );
       tempItem.classList.toggle("is-critical", temp >= TEMP_CRITICAL);
     }
   }, (err) => console.warn(`[battery:${device}] lecture RTDB impossible:`, err.message));

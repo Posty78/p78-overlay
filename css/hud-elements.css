@@ -39,6 +39,8 @@
 
 .hud-icon__body { fill: none; stroke: #ffffff; stroke-width: 2px; stroke-linejoin: round; }
 .hud-icon__nub  { fill: #ffffff; }
+.hud-icon__body-bg { fill: #ffffff; }
+.hud-temp__tick { stroke: #000000; stroke-width: 1.3px; stroke-linecap: round; }
 
 /* Remplissage batterie : couleur = %% réel, indépendante de la charge */
 .hud-battery__fill--good { fill: #2ecc40; }
