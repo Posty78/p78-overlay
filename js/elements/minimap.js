@@ -43,7 +43,20 @@ export function create() {
         keyboardShortcuts: false,
         clickableIcons: false,
       });
-      marker = new google.maps.Marker({ map, position: map.getCenter() });
+      // Point bleu "position actuelle" (comme le standard Google Maps/GPS live),
+      // pas le pin rouge par défaut qui sert normalement à repérer un lieu fixe.
+      marker = new google.maps.Marker({
+        map,
+        position: map.getCenter(),
+        icon: {
+          path: google.maps.SymbolPath.CIRCLE,
+          scale: 9,
+          fillColor: "#4285f4",
+          fillOpacity: 1,
+          strokeColor: "#ffffff",
+          strokeWeight: 3,
+        },
+      });
 
       const ref = doc(mapsDb, TRACKING_POSITION_DOC.collection, TRACKING_POSITION_DOC.document);
       onSnapshot(ref, (snapshot) => {
