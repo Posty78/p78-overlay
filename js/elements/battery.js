@@ -29,10 +29,15 @@ const BATTERY_ICON = `
   </svg>
 `;
 
+// Le contour et le remplissage partagent EXACTEMENT le même contour (silhouette
+// classique "thermomètre" : tige + bulbe) pour que la couleur remplisse tout
+// l'intérieur sans laisser d'anneau vide - contrairement à l'ancienne version où
+// le bulbe du remplissage avait un rayon différent de celui du contour.
+const TEMP_SILHOUETTE = "M13 3v10.34a4 4 0 1 1-4 0V3a2 2 0 0 1 4 0Z";
 const TEMP_ICON = `
-  <svg class="hud-icon hud-icon--temp" viewBox="0 0 24 40" xmlns="http://www.w3.org/2000/svg">
-    <path class="hud-icon__body" d="M9.5 5.5a2.5 2.5 0 0 1 5 0v16.8a7 7 0 1 1-5 0Z"/>
-    <path class="hud-temp__fill" d="M11 8v14.4a4 4 0 1 0 2 0V8Z"/>
+  <svg class="hud-icon hud-icon--temp" viewBox="0 0 18 22" xmlns="http://www.w3.org/2000/svg">
+    <path class="hud-temp__fill" d="${TEMP_SILHOUETTE}"/>
+    <path class="hud-icon__body" fill="none" d="${TEMP_SILHOUETTE}"/>
   </svg>
 `;
 
