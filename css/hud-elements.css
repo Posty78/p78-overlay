@@ -27,12 +27,34 @@
   font-size: 38px;
   color: #ffffff;
   display: flex;
-  gap: 20px;
+  gap: 22px;
   align-items: center;
   text-shadow: 2px 2px 0 #000, -2px -2px 0 #000, 2px -2px 0 #000, -2px 2px 0 #000;
 }
-.hud-battery__item { display: flex; align-items: center; gap: 6px; }
-.hud-battery__item.is-low { color: #ff3b30; }
+.hud-battery__item { display: flex; align-items: center; gap: 8px; }
+
+.hud-icon { display: block; filter: drop-shadow(0 0 3px rgba(0,0,0,0.9)); }
+.hud-icon--battery { width: 52px; height: 32px; }
+.hud-icon--temp { width: 26px; height: 42px; }
+
+.hud-icon__body { fill: none; stroke: #ffffff; stroke-width: 2px; stroke-linejoin: round; }
+.hud-icon__nub  { fill: #ffffff; }
+
+/* Remplissage batterie : couleur = %% réel, indépendante de la charge */
+.hud-battery__fill--good { fill: #2ecc40; }
+.hud-battery__fill--warn { fill: #ff9500; }
+.hud-battery__fill--bad  { fill: #ff3b30; }
+
+/* Badge éclair jaune : visible uniquement en charge, en plus de la couleur ci-dessus */
+.hud-battery__charge { fill: #ffd60a; stroke: #000; stroke-width: 1px; stroke-linejoin: round; }
+
+/* Remplissage thermomètre : mêmes paliers que la batterie mais lecture inversée (haut = mauvais) */
+.hud-temp__fill--good { fill: #2ecc40; }
+.hud-temp__fill--warn { fill: #ff9500; }
+.hud-temp__fill--bad  { fill: #ff3b30; }
+
+@keyframes hud-blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.2; } }
+.hud-battery__item.is-critical { animation: hud-blink 0.7s steps(1, start) infinite; }
 
 /* --- Argent --- */
 .hud-money {
