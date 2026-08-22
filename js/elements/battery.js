@@ -35,7 +35,7 @@ const BATTERY_ICON = `
 // seul tracé continu pour le contour ET le remplissage, donc aucun risque de
 // décalage entre les deux comme sur les versions précédentes.
 const TEMP_SILHOUETTE =
-  "M6.31,8.06 A4,4 0 0,1 6.31,15.94 L28.61,19.88 A8,8 0 1,1 28.61,4.12 Z";
+  "M6.31,8.06 A4,4 0 0,0 6.31,15.94 L28.61,19.88 A8,8 0 1,0 28.61,4.12 Z";
 const TEMP_ICON = `
   <svg class="hud-icon hud-icon--temp" viewBox="0 0 40 24" xmlns="http://www.w3.org/2000/svg">
     <path class="hud-temp__fill" d="${TEMP_SILHOUETTE}"/>
