@@ -342,18 +342,27 @@ function wireDrag(wrapper, id) {
 
 function wireResize(wrapper, handle, id) {
   let resizing = false;
+  let cropMode = false;
   let startClientX = 0;
   let startClientY = 0;
   let startScale = 1;
+  let startW = 0;
+  let startH = 0;
 
   handle.addEventListener("pointerdown", (e) => {
     e.stopPropagation();
     resizing = true;
+    // Alt+glisser = recadre le cadre lui-meme (comme OBS), au lieu de zoomer le
+    // contenu - n'a de sens que pour les types avec une vraie largeur/hauteur
+    // (widget externe), pour tout le reste on retombe sur le zoom habituel.
+    cropMode = e.altKey;
     handle.setPointerCapture(e.pointerId);
     startClientX = e.clientX;
     startClientY = e.clientY;
     const el = currentElements.find((c) => c.id === id);
     startScale = el.scale ?? 1;
+    startW = el.w ?? 400;
+    startH = el.h ?? 300;
   });
 
   handle.addEventListener("pointermove", (e) => {
@@ -361,6 +370,17 @@ function wireResize(wrapper, handle, id) {
     e.stopPropagation();
     const dx = (e.clientX - startClientX) / stageScale;
     const dy = (e.clientY - startClientY) / stageScale;
+    const el = currentElements.find((c) => c.id === id);
+
+    if (cropMode && el && el.type === "iframe") {
+      el.w = Math.max(40, Math.round(startW + dx));
+      el.h = Math.max(40, Math.round(startH + dy));
+      const mounted = mountedNodes[id];
+      const module = ELEMENT_MODULES[el.type];
+      if (mounted && module.applyConfig) module.applyConfig(mounted.node, el);
+      return;
+    }
+
     const delta = (dx + dy) / 2 / 150;
     const newScale = Math.max(0.2, Math.min(4, startScale + delta));
     wrapper.style.transform = `scale(${newScale})`;
@@ -523,6 +543,11 @@ function renderElementList() {
       sizeRow.appendChild(document.createTextNode("H"));
       sizeRow.appendChild(hInput);
       details.appendChild(sizeRow);
+
+      const cropHint = document.createElement("div");
+      cropHint.className = "hint";
+      cropHint.textContent = "Astuce : Alt + glisser le rond de redimensionnement sur le canvas = recadre le cadre (comme OBS), sans zoomer le contenu.";
+      details.appendChild(cropHint);
 
       if (el.demo !== false) {
         const btnDemo = document.createElement("button");
