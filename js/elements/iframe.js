@@ -39,6 +39,9 @@ export function applyConfig(el, elConfig) {
   iframe.style.height = "100%";
   iframe.style.border = "none";
   iframe.setAttribute("allowtransparency", "true");
+  // Sans ça, le navigateur bloque par défaut l'autoplay avec son dans une iframe
+  // (utile si le widget en question doit jouer un son, ex: notification de don).
+  iframe.setAttribute("allow", "autoplay");
   el.appendChild(iframe);
 
   el._watchdogTimer = setInterval(() => {

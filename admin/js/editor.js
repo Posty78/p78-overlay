@@ -9,7 +9,7 @@ import * as money from "../../js/elements/money.js?v=1";
 import * as stars from "../../js/elements/stars.js?v=1";
 import * as weapon from "../../js/elements/weapon.js?v=1";
 import * as minimap from "../../js/elements/minimap.js?v=1";
-import * as iframe from "../../js/elements/iframe.js?v=1";
+import * as iframe from "../../js/elements/iframe.js?v=2";
 import * as watermark from "../../js/elements/watermark.js?v=2";
 import * as weather from "../../js/elements/weather.js?v=1";
 
