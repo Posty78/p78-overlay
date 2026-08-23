@@ -52,6 +52,7 @@ let activeSceneId = null;
 let stageScale = 1;
 let mountedNodes = {}; // id -> { wrapper, node, type }
 let latestGtaState = {};
+let selectedElementId = null;
 
 export async function initEditor() {
   await ensureSeedData();
@@ -253,7 +254,7 @@ function renderCanvas() {
 
     const label = document.createElement("div");
     label.className = "editor-el__label";
-    label.textContent = TYPE_LABELS[elConfig.type] || elConfig.type;
+    label.textContent = elConfig.label || TYPE_LABELS[elConfig.type] || elConfig.type;
     wrapper.appendChild(label);
 
     const node = module.create(elConfig);
@@ -268,7 +269,9 @@ function renderCanvas() {
     wrapper.style.top = `${elConfig.y}px`;
     wrapper.style.transform = `scale(${elConfig.scale ?? 1})`;
     wrapper.dataset.visible = elConfig.visible !== false ? "true" : "false";
+    wrapper.classList.toggle("editor-el--selected", elConfig.id === selectedElementId);
 
+    wrapper.addEventListener("pointerdown", () => selectElement(elConfig.id, { rerenderList: true }));
     wireDrag(wrapper, elConfig.id);
     wireResize(wrapper, handle, elConfig.id);
     stage.appendChild(wrapper);
@@ -276,6 +279,22 @@ function renderCanvas() {
   }
 
   applyGtaStateToMounted();
+}
+
+// Selectionner un element l'amene au premier plan (dernier enfant = dessine par-dessus
+// les autres) et l'entoure d'un contour bleu - indispensable des que deux widgets
+// externes se superposent : sans ca, impossible de cliquer/deplacer celui du dessous,
+// il faut d'abord le faire passer devant depuis la liste ou en cliquant dessus.
+function selectElement(id, { rerenderList = false } = {}) {
+  selectedElementId = id;
+  const mounted = mountedNodes[id];
+  if (mounted) {
+    stage.appendChild(mounted.wrapper); // le remonte au-dessus de tous les autres
+  }
+  for (const [elId, { wrapper }] of Object.entries(mountedNodes)) {
+    wrapper.classList.toggle("editor-el--selected", elId === id);
+  }
+  if (rerenderList) renderElementList();
 }
 
 function applyGtaStateToMounted() {
@@ -365,7 +384,7 @@ function renderElementList() {
     const displayName = el.label || TYPE_LABELS[el.type] || el.type;
 
     const row = document.createElement("div");
-    row.className = "element-row";
+    row.className = "element-row" + (el.id === selectedElementId ? " element-row--selected" : "");
 
     // --- Ligne principale : nom + visibilité + détails + suppr ---
     const header = document.createElement("div");
@@ -374,6 +393,8 @@ function renderElementList() {
     const name = document.createElement("div");
     name.className = "element-row__name";
     name.textContent = displayName;
+    name.title = "Cliquer pour sélectionner et faire passer au premier plan sur le canvas";
+    name.addEventListener("click", () => selectElement(el.id, { rerenderList: true }));
     header.appendChild(name);
 
     const btnVisible = document.createElement("button");
@@ -417,10 +438,38 @@ function renderElementList() {
       labelInput.addEventListener("change", () => {
         el.label = labelInput.value.trim();
         persistElements();
+        renderCanvas();
         renderElementList();
       });
       details.appendChild(labelInput);
     }
+
+    // Positionnement au clavier (X/Y exacts) : indispensable quand deux widgets se
+    // superposent presque totalement sur le canvas et qu'il devient difficile de les
+    // ecarter uniquement a la souris.
+    const posRow = document.createElement("div");
+    posRow.className = "detail-field";
+    const xInput = document.createElement("input");
+    xInput.type = "number";
+    xInput.value = Math.round(el.x);
+    xInput.addEventListener("change", () => {
+      setElementPosition(el.id, Number(xInput.value), el.y);
+      persistElements();
+      renderCanvas();
+    });
+    const yInput = document.createElement("input");
+    yInput.type = "number";
+    yInput.value = Math.round(el.y);
+    yInput.addEventListener("change", () => {
+      setElementPosition(el.id, el.x, Number(yInput.value));
+      persistElements();
+      renderCanvas();
+    });
+    posRow.appendChild(document.createTextNode("X"));
+    posRow.appendChild(xInput);
+    posRow.appendChild(document.createTextNode("Y"));
+    posRow.appendChild(yInput);
+    details.appendChild(posRow);
 
     const scaleRow = document.createElement("div");
     scaleRow.className = "detail-field";

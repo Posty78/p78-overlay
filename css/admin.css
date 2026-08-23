@@ -139,6 +139,11 @@ input:focus, select:focus { outline: 1.5px solid #3b82f6; border-color: #3b82f6;
 }
 .editor-el:active { cursor: grabbing; }
 .editor-el[data-visible="false"] { opacity: 0.25; }
+.editor-el--selected {
+  outline: 2px solid #3b82f6;
+  box-shadow: 0 0 0 4px rgba(59,130,246,0.25);
+}
+.editor-el--selected .editor-el__label { background: #3b82f6; }
 
 .editor-el__resize-handle {
   position: absolute;
@@ -191,6 +196,8 @@ section.panel h2 {
   margin: 0 0 10px;
   padding-bottom: 8px;
   border-bottom: 1px solid #21242b;
+  cursor: pointer;
+  user-select: none;
 }
 section.panel h2::before {
   content: "";
@@ -200,6 +207,16 @@ section.panel h2::before {
   background: var(--accent);
   flex-shrink: 0;
 }
+section.panel h2::after {
+  content: "▾";
+  margin-left: auto;
+  font-size: 10px;
+  color: #575c65;
+  transition: transform 150ms ease;
+}
+section.panel.is-collapsed h2 { margin-bottom: 0; border-bottom: none; }
+section.panel.is-collapsed h2::after { transform: rotate(-90deg); }
+section.panel.is-collapsed > :not(h2) { display: none; }
 
 /* --- Lignes d'élément --- */
 .element-row {
@@ -211,6 +228,8 @@ section.panel h2::before {
   transition: border-color 120ms ease, background 120ms ease;
 }
 .element-row:hover { border-color: #3a3e47; background: #1d1f26; }
+.element-row--selected { border-color: #3b82f6; box-shadow: 0 0 0 1px #3b82f6 inset; }
+.element-row__name { cursor: pointer; }
 
 .element-row__header {
   display: flex;
