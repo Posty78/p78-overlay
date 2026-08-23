@@ -149,8 +149,8 @@
 /* --- Watermark (PNG uploadé depuis le panel) --- */
 .hud-watermark img {
   display: block;
-  max-width: 260px;
-  max-height: 100px;
+  width: 100%;
+  height: 100%;
   object-fit: contain;
   filter: drop-shadow(0 0 4px rgba(0,0,0,0.6));
 }

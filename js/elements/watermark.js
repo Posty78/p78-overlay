@@ -6,6 +6,9 @@ export function create(elConfig) {
 }
 
 export function applyConfig(el, elConfig) {
+  el.style.width = `${elConfig?.w ?? 260}px`;
+  el.style.height = `${elConfig?.h ?? 100}px`;
+
   const url = elConfig?.url || "";
   if (el.dataset.currentUrl === url) return;
   el.dataset.currentUrl = url;

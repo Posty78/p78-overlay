@@ -147,8 +147,6 @@ input:focus, select:focus { outline: 1.5px solid #3b82f6; border-color: #3b82f6;
 
 .editor-el__resize-handle {
   position: absolute;
-  right: -9px;
-  bottom: -9px;
   width: 16px;
   height: 16px;
   background: #3b82f6;
@@ -156,6 +154,8 @@ input:focus, select:focus { outline: 1.5px solid #3b82f6; border-color: #3b82f6;
   border-radius: 50%;
   cursor: nwse-resize;
 }
+.editor-el__resize-handle--br { right: -9px; bottom: -9px; }
+.editor-el__resize-handle--tl { left: -9px; top: -9px; }
 .editor-el .editor-el__label {
   position: absolute;
   top: -22px;

@@ -10,7 +10,7 @@ import * as stars from "../../js/elements/stars.js?v=1";
 import * as weapon from "../../js/elements/weapon.js?v=1";
 import * as minimap from "../../js/elements/minimap.js?v=1";
 import * as iframe from "../../js/elements/iframe.js?v=1";
-import * as watermark from "../../js/elements/watermark.js?v=1";
+import * as watermark from "../../js/elements/watermark.js?v=2";
 import * as weather from "../../js/elements/weather.js?v=1";
 
 const ELEMENT_MODULES = { clock, battery, money, stars, weapon, minimap, iframe, watermark, weather };
@@ -26,6 +26,9 @@ const TYPE_LABELS = {
   weather: "Météo (ville + temp)",
 };
 const MULTI_INSTANCE_TYPES = new Set(["iframe", "battery"]);
+// Types avec une vraie largeur/hauteur configurable (donc "recadrables", au sens
+// OBS du terme) plutot qu'un simple zoom uniforme via l'echelle.
+const CROPPABLE_TYPES = new Set(["iframe", "watermark"]);
 
 const DEFAULT_ELEMENTS = [
   { id: "clock", type: "clock", x: 1750, y: 30, scale: 1, visible: true },
@@ -262,7 +265,7 @@ function renderCanvas() {
     wrapper.appendChild(node);
 
     const handle = document.createElement("div");
-    handle.className = "editor-el__resize-handle";
+    handle.className = "editor-el__resize-handle editor-el__resize-handle--br";
     wrapper.appendChild(handle);
 
     wrapper.style.left = `${elConfig.x}px`;
@@ -273,7 +276,18 @@ function renderCanvas() {
 
     wrapper.addEventListener("pointerdown", () => selectElement(elConfig.id, { rerenderList: true }));
     wireDrag(wrapper, elConfig.id);
-    wireResize(wrapper, handle, elConfig.id);
+    wireResize(wrapper, handle, elConfig.id, "br");
+
+    // 2eme poignee (coin oppose) uniquement pour les types recadrables : permet
+    // de recadrer depuis le coin le plus pratique sans avoir a viser toujours
+    // le meme, ni a se souvenir de la combinaison Alt.
+    if (CROPPABLE_TYPES.has(elConfig.type)) {
+      const handleTL = document.createElement("div");
+      handleTL.className = "editor-el__resize-handle editor-el__resize-handle--tl";
+      wrapper.appendChild(handleTL);
+      wireResize(wrapper, handleTL, elConfig.id, "tl");
+    }
+
     stage.appendChild(wrapper);
     mountedNodes[elConfig.id] = { wrapper, node, type: elConfig.type };
   }
@@ -340,7 +354,28 @@ function wireDrag(wrapper, id) {
   });
 }
 
-function wireResize(wrapper, handle, id) {
+const MIN_CROP_SIZE = 40;
+
+function applyCropLive(id, el, newW, newH, newX, newY, wrapper) {
+  el.w = newW;
+  el.h = newH;
+  if (newX !== undefined) {
+    el.x = newX;
+    el.y = newY;
+    wrapper.style.left = `${newX}px`;
+    wrapper.style.top = `${newY}px`;
+  }
+  const mounted = mountedNodes[id];
+  const module = ELEMENT_MODULES[el.type];
+  if (mounted && module.applyConfig) module.applyConfig(mounted.node, el);
+}
+
+// corner "br" (poignee historique, bas-droite) : glisser seul = zoom (ancre en
+// haut-gauche), Alt+glisser = recadre depuis ce coin, pour les types
+// "recadrables" (widget externe, filigrane) uniquement.
+// corner "tl" (2eme poignee, haut-gauche) : dediee au recadrage depuis l'autre
+// coin, ancre au coin bas-droit oppose - pas besoin d'Alt, elle ne sert qu'a ca.
+function wireResize(wrapper, handle, id, corner = "br") {
   let resizing = false;
   let cropMode = false;
   let startClientX = 0;
@@ -348,21 +383,22 @@ function wireResize(wrapper, handle, id) {
   let startScale = 1;
   let startW = 0;
   let startH = 0;
+  let startX = 0;
+  let startY = 0;
 
   handle.addEventListener("pointerdown", (e) => {
     e.stopPropagation();
     resizing = true;
-    // Alt+glisser = recadre le cadre lui-meme (comme OBS), au lieu de zoomer le
-    // contenu - n'a de sens que pour les types avec une vraie largeur/hauteur
-    // (widget externe), pour tout le reste on retombe sur le zoom habituel.
-    cropMode = e.altKey;
+    cropMode = corner === "tl" || e.altKey;
     handle.setPointerCapture(e.pointerId);
     startClientX = e.clientX;
     startClientY = e.clientY;
     const el = currentElements.find((c) => c.id === id);
     startScale = el.scale ?? 1;
-    startW = el.w ?? 400;
-    startH = el.h ?? 300;
+    startW = el.w ?? (el.type === "watermark" ? 260 : 400);
+    startH = el.h ?? (el.type === "watermark" ? 100 : 300);
+    startX = el.x;
+    startY = el.y;
   });
 
   handle.addEventListener("pointermove", (e) => {
@@ -372,12 +408,23 @@ function wireResize(wrapper, handle, id) {
     const dy = (e.clientY - startClientY) / stageScale;
     const el = currentElements.find((c) => c.id === id);
 
-    if (cropMode && el && el.type === "iframe") {
-      el.w = Math.max(40, Math.round(startW + dx));
-      el.h = Math.max(40, Math.round(startH + dy));
-      const mounted = mountedNodes[id];
-      const module = ELEMENT_MODULES[el.type];
-      if (mounted && module.applyConfig) module.applyConfig(mounted.node, el);
+    if (cropMode && el && CROPPABLE_TYPES.has(el.type)) {
+      if (corner === "tl") {
+        // Le coin bas-droit (x+w, y+h) doit rester fixe : on deplace x/y ET on
+        // reduit w/h du meme montant, en clampant pour ne pas passer sous la
+        // taille minimale tout en gardant ce coin oppose parfaitement ancre.
+        let newW = startW - dx;
+        let effectiveDx = dx;
+        if (newW < MIN_CROP_SIZE) { newW = MIN_CROP_SIZE; effectiveDx = startW - MIN_CROP_SIZE; }
+        let newH = startH - dy;
+        let effectiveDy = dy;
+        if (newH < MIN_CROP_SIZE) { newH = MIN_CROP_SIZE; effectiveDy = startH - MIN_CROP_SIZE; }
+        applyCropLive(id, el, Math.round(newW), Math.round(newH), Math.round(startX + effectiveDx), Math.round(startY + effectiveDy), wrapper);
+      } else {
+        const newW = Math.max(MIN_CROP_SIZE, Math.round(startW + dx));
+        const newH = Math.max(MIN_CROP_SIZE, Math.round(startH + dy));
+        applyCropLive(id, el, newW, newH, undefined, undefined, wrapper);
+      }
       return;
     }
 
@@ -508,23 +555,15 @@ function renderElementList() {
     scaleRow.appendChild(scaleInput);
     details.appendChild(scaleRow);
 
-    if (el.type === "iframe") {
-      const urlInput = document.createElement("input");
-      urlInput.type = "text";
-      urlInput.placeholder = "https://...";
-      urlInput.value = el.url || "";
-      urlInput.addEventListener("change", () => {
-        el.url = urlInput.value.trim();
-        persistElements();
-        renderCanvas();
-      });
-      details.appendChild(urlInput);
+    if (CROPPABLE_TYPES.has(el.type)) {
+      const defaultW = el.type === "watermark" ? 260 : 400;
+      const defaultH = el.type === "watermark" ? 100 : 300;
 
       const sizeRow = document.createElement("div");
       sizeRow.className = "detail-field";
       const wInput = document.createElement("input");
       wInput.type = "number";
-      wInput.value = el.w ?? 400;
+      wInput.value = el.w ?? defaultW;
       wInput.addEventListener("change", () => {
         el.w = Number(wInput.value);
         persistElements();
@@ -532,7 +571,7 @@ function renderElementList() {
       });
       const hInput = document.createElement("input");
       hInput.type = "number";
-      hInput.value = el.h ?? 300;
+      hInput.value = el.h ?? defaultH;
       hInput.addEventListener("change", () => {
         el.h = Number(hInput.value);
         persistElements();
@@ -546,8 +585,21 @@ function renderElementList() {
 
       const cropHint = document.createElement("div");
       cropHint.className = "hint";
-      cropHint.textContent = "Astuce : Alt + glisser le rond de redimensionnement sur le canvas = recadre le cadre (comme OBS), sans zoomer le contenu.";
+      cropHint.textContent = "Astuce : glisse le rond bleu en bas à droite pour recadrer depuis ce coin, ou celui en haut à gauche pour recadrer depuis l'autre coin (comme OBS, sans zoomer le contenu).";
       details.appendChild(cropHint);
+    }
+
+    if (el.type === "iframe") {
+      const urlInput = document.createElement("input");
+      urlInput.type = "text";
+      urlInput.placeholder = "https://...";
+      urlInput.value = el.url || "";
+      urlInput.addEventListener("change", () => {
+        el.url = urlInput.value.trim();
+        persistElements();
+        renderCanvas();
+      });
+      details.appendChild(urlInput);
 
       if (el.demo !== false) {
         const btnDemo = document.createElement("button");

@@ -7,7 +7,7 @@ import * as stars from "./elements/stars.js?v=1";
 import * as weapon from "./elements/weapon.js?v=1";
 import * as minimap from "./elements/minimap.js?v=1";
 import * as iframe from "./elements/iframe.js?v=1";
-import * as watermark from "./elements/watermark.js?v=1";
+import * as watermark from "./elements/watermark.js?v=2";
 import * as weather from "./elements/weather.js?v=1";
 import { mountCensure } from "./elements/censure.js?v=1";
 
