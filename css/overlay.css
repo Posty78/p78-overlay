@@ -54,3 +54,67 @@ html, body {
   object-fit: cover;
   display: block;
 }
+
+/* Widget de supervision réseau Peplink (!regis) : comme le masque de censure,
+   hors du système de scènes, toujours monté, visible seulement 15s après
+   déclenchement (voir peplink.js). */
+.hud-peplink {
+  position: absolute;
+  top: 40px;
+  left: 50%;
+  transform: translateX(-50%) translateY(-16px);
+  z-index: 999998;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  background: rgba(10, 10, 10, 0.85);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 10px;
+  padding: 14px 26px;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 0.35s ease, transform 0.35s ease;
+}
+.hud-peplink.is-visible {
+  opacity: 1;
+  transform: translateX(-50%) translateY(0);
+}
+.hud-peplink__title {
+  font-family: "Rajdhani", sans-serif;
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: 0.2em;
+  color: #ffffff;
+}
+.hud-peplink__lines {
+  display: flex;
+  gap: 20px;
+}
+.hud-peplink__line {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.hud-peplink__dot {
+  width: 12px;
+  height: 12px;
+  border-radius: 50%;
+  box-shadow: 0 0 6px currentColor;
+  flex-shrink: 0;
+}
+.hud-peplink__dot--green { background: #2ecc40; color: #2ecc40; }
+.hud-peplink__dot--orange { background: #ffab00; color: #ffab00; }
+.hud-peplink__dot--red { background: #e0263f; color: #e0263f; }
+.hud-peplink__carrier {
+  font-family: "Teko", sans-serif;
+  font-weight: 600;
+  font-size: 22px;
+  color: #ffffff;
+  text-transform: uppercase;
+}
+.hud-peplink__empty {
+  font-family: "Teko", sans-serif;
+  font-size: 18px;
+  color: rgba(255, 255, 255, 0.6);
+}

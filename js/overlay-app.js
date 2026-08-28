@@ -10,11 +10,13 @@ import * as iframe from "./elements/iframe.js?v=2";
 import * as watermark from "./elements/watermark.js?v=2";
 import * as weather from "./elements/weather.js?v=1";
 import { mountCensure } from "./elements/censure.js?v=1";
+import { mountPeplink } from "./elements/peplink.js?v=1";
 
 const ELEMENTS = { clock, battery, money, stars, weapon, minimap, iframe, watermark, weather };
 
 // Hors systeme de scenes expres : doit pouvoir masquer n'importe quelle scene active.
 mountCensure();
+mountPeplink();
 
 const stage = document.getElementById("stage");
 let mountedNodes = {}; // elementId -> { node, type }
