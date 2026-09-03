@@ -16,10 +16,30 @@ const ADMIN_UIDS = [
 
 const STARS_MAX = 6;
 
+// Limiteur de debit simple (memoire du process, par IP) - reduit fortement
+// l'abus "un script qui boucle" sur les fonctions publiques sans auth
+// (weatherProxy, widgetProxy). Pas une protection absolue (n'importe qui avec
+// beaucoup d'IP differentes peut contourner un compteur en memoire), mais
+// combine a maxInstances ci-dessous, ca borne le pire cas. Le vrai plafond
+// dur reste le budget de facturation Google Cloud (voir doc separee).
+const RATE_LIMIT_WINDOW_MS = 60_000;
+const rateLimitBuckets = new Map();
+
+function isRateLimited(key, maxPerWindow) {
+  const now = Date.now();
+  const bucket = rateLimitBuckets.get(key);
+  if (!bucket || now - bucket.windowStart > RATE_LIMIT_WINDOW_MS) {
+    rateLimitBuckets.set(key, { count: 1, windowStart: now });
+    return false;
+  }
+  bucket.count += 1;
+  return bucket.count > maxPerWindow;
+}
+
 // Appelée par Botsty78 (ou tout autre bot chat plus tard) sur chaque commande !argent / !etoile / !<arme>.
 // Protégée par une clé secrète fixe (COMMAND_SECRET) connue uniquement du bot.
 exports.commandWebhook = onRequest(
-  { region: "europe-west1", secrets: [COMMAND_SECRET], cors: true },
+  { region: "europe-west1", secrets: [COMMAND_SECRET], cors: true, maxInstances: 10 },
   async (req, res) => {
     const providedSecret = req.get("x-overlay-secret") || req.query.key;
     if (providedSecret !== COMMAND_SECRET.value()) {
@@ -157,7 +177,12 @@ const ALLOWED_PROXY_HOSTS = ["posty78.fr", "regis.posty78.fr"];
 // toucher au serveur source : récupère la page côté serveur, ne retransmet pas ces en-têtes,
 // et absolutise les chemins relatifs + le endpoint socket.io pour que le widget reste
 // pleinement fonctionnel (connexion temps réel branchée directement sur le vrai serveur).
-exports.widgetProxy = onRequest({ region: "europe-west1", cors: true }, async (req, res) => {
+exports.widgetProxy = onRequest({ region: "europe-west1", cors: true, maxInstances: 10 }, async (req, res) => {
+  if (isRateLimited(`widget:${req.ip}`, 60)) {
+    res.status(429).send("trop de requetes, reessaie dans une minute");
+    return;
+  }
+
   const targetUrl = req.query.url;
   if (!targetUrl) {
     res.status(400).send("missing url param");
@@ -231,8 +256,16 @@ function extractCity(geocodeResult) {
 // l'overlay. Clé Geocoding/Weather gardée côté serveur (pas de restriction par
 // referrer possible sur ces APIs, donc jamais exposée au navigateur).
 exports.weatherProxy = onRequest(
-  { region: "europe-west1", secrets: [WEATHER_API_KEY], cors: true },
+  // maxInstances borne le pire cas (nombre d'executions paralleles, donc
+  // d'appels payants Google simultanes) meme si le rate-limit par IP est
+  // contourne par un attaquant avec plusieurs IP.
+  { region: "europe-west1", secrets: [WEATHER_API_KEY], cors: true, maxInstances: 5 },
   async (req, res) => {
+    if (isRateLimited(`weather:${req.ip}`, 20)) {
+      res.status(429).json({ ok: false, error: "trop de requetes, reessaie dans une minute" });
+      return;
+    }
+
     const lat = parseFloat(req.query.lat);
     const lng = parseFloat(req.query.lng);
     if (Number.isNaN(lat) || Number.isNaN(lng)) {
@@ -283,7 +316,7 @@ exports.weatherProxy = onRequest(
 // overlay et regis.posty78.fr lisent ce document, sans intermediaire ici.
 
 // Appelée depuis le panel admin (bouton reset). Auth requise : ID token Firebase d'un UID whitelisté.
-exports.resetState = onRequest({ region: "europe-west1", cors: true }, async (req, res) => {
+exports.resetState = onRequest({ region: "europe-west1", cors: true, maxInstances: 5 }, async (req, res) => {
   const authHeader = req.get("authorization") || "";
   const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
   if (!token) {
