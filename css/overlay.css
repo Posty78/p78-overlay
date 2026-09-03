@@ -55,17 +55,14 @@ html, body {
   display: block;
 }
 
-/* Widget de supervision réseau Peplink (!regis) : comme le masque de censure,
-   hors du système de scènes, toujours monté, visible seulement le temps du
-   scan (voir VISIBLE_DURATION_MS dans peplink.js). Liste verticale : jusqu'à
-   6 lignes (4 WAN Peplink + Données mobile + Starlink) empilées de haut en
-   bas, jamais serré horizontalement meme avec des libelles longs. */
+/* Widget de supervision réseau Peplink (!regis) : widget normal du système de
+   scènes (ajouté/déplacé/redimensionné depuis l'éditeur, comme les autres) -
+   le positionnement (left/top/scale) vient de .hud-el + positionNode(), pas
+   d'ici. Invisible par défaut sur le direct, ne s'affiche qu'au déclenchement,
+   pendant 15s (voir VISIBLE_DURATION_MS dans peplink.js). Liste verticale :
+   jusqu'à 6 lignes (4 WAN Peplink + Données mobile + Starlink) empilées de
+   haut en bas, jamais serré horizontalement même avec des libellés longs. */
 .hud-peplink {
-  position: absolute;
-  top: 40px;
-  left: 50%;
-  transform: translateX(-50%) translateY(-16px);
-  z-index: 999998;
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -76,11 +73,10 @@ html, body {
   padding: 16px 26px;
   opacity: 0;
   pointer-events: none;
-  transition: opacity 0.35s ease, transform 0.35s ease;
+  transition: opacity 0.35s ease;
 }
 .hud-peplink.is-visible {
   opacity: 1;
-  transform: translateX(-50%) translateY(0);
 }
 .hud-peplink__title {
   font-family: "Rajdhani", sans-serif;

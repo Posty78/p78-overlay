@@ -12,8 +12,9 @@ import * as minimap from "../../js/elements/minimap.js?v=1";
 import * as iframe from "../../js/elements/iframe.js?v=2";
 import * as watermark from "../../js/elements/watermark.js?v=2";
 import * as weather from "../../js/elements/weather.js?v=1";
+import * as peplink from "../../js/elements/peplink.js?v=2";
 
-const ELEMENT_MODULES = { clock, battery, money, stars, weapon, minimap, iframe, watermark, weather };
+const ELEMENT_MODULES = { clock, battery, money, stars, weapon, minimap, iframe, watermark, weather, peplink };
 const TYPE_LABELS = {
   clock: "Horloge (+ barres)",
   battery: "Batterie / Temp",
@@ -24,6 +25,7 @@ const TYPE_LABELS = {
   iframe: "Widget externe (URL)",
   watermark: "Filigrane (PNG)",
   weather: "Météo (ville + temp)",
+  peplink: "Réseau (Regis)",
 };
 const MULTI_INSTANCE_TYPES = new Set(["iframe", "battery"]);
 // Types avec une vraie largeur/hauteur configurable (donc "recadrables", au sens
@@ -262,6 +264,10 @@ function renderCanvas() {
 
     const node = module.create(elConfig);
     node.style.pointerEvents = "none";
+    // Certains widgets (Regis) sont invisibles par defaut sur le direct et ne
+    // s'affichent qu'au declenchement - on force un apercu fixe ici pour
+    // pouvoir les voir/positionner dans l'editeur.
+    if (node._previewInEditor) node._previewInEditor();
     wrapper.appendChild(node);
 
     const handle = document.createElement("div");

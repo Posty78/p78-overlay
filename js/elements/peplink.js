@@ -2,12 +2,12 @@ import { doc, onSnapshot } from "https://www.gstatic.com/firebasejs/10.12.0/fire
 import { db } from "../firebase-init.js?v=1";
 
 // Widget de supervision reseau (Peplink ou wifi generique selon detection cote
-// telephone), declenche par !regis (moderateurs uniquement, filtre cote bot
-// Botsty78) ou par le bouton de regis.posty78.fr. Hors systeme de scenes expres
-// (meme principe que censure.js) : doit pouvoir s'afficher par-dessus n'importe
-// quelle scene active, pendant EXACTEMENT 15s, puis disparaitre tout seul -
-// meme si le telephone scanne encore (son propre scan dure 20s cote APK, mais
-// la duree d'affichage widget est volontairement fixee a 15s, non negociable).
+// telephone). Widget normal du systeme de scenes (comme les autres : ajoute,
+// deplace, redimensionne depuis l'editeur) - invisible par defaut sur l'overlay
+// en direct, ne s'affiche qu'au declenchement (!regis ou bouton de
+// regis.posty78.fr), pendant EXACTEMENT 15s, puis disparait tout seul - meme
+// si le telephone scanne encore (son propre scan dure 20s cote APK, mais la
+// duree d'affichage widget est volontairement fixee a 15s, non negociable).
 //
 // Les vraies donnees (Mbps par ligne) sont scrapees en direct par l'APK
 // PostyMonitor sur le telephone de stream, qui les pousse dans
@@ -69,15 +69,18 @@ const DEMO_SCENARIOS = [
   },
 ];
 
-export function mountPeplink() {
+// Contenu fixe montre dans l'EDITEUR de scene uniquement (pour pouvoir voir/
+// positionner le widget alors qu'il est normalement invisible sur le direct) -
+// jamais ecrit dans Firestore, jamais visible sur l'overlay en direct.
+const EDITOR_PREVIEW_LINES = DEMO_SCENARIOS[5].lines;
+
+export function create() {
   const el = document.createElement("div");
-  el.id = "peplink-widget";
   el.className = "hud-peplink";
   el.innerHTML = `
     <div class="hud-peplink__title">RÉSEAU</div>
     <div class="hud-peplink__lines" data-role="lines"></div>
   `;
-  document.body.appendChild(el);
 
   let lastTriggeredAt = null;
   let lastDemoTriggeredAt = null;
@@ -169,4 +172,16 @@ export function mountPeplink() {
       )
       .join("");
   }
+
+  // Appelee uniquement par l'editeur de scene (jamais sur l'overlay en direct)
+  // pour afficher un contenu de demonstration fixe pendant le positionnement.
+  el._previewInEditor = () => {
+    clearTimeout(hideTimer);
+    clearInterval(demoInterval);
+    isDemoActive = false;
+    el.classList.add("is-visible");
+    render(EDITOR_PREVIEW_LINES);
+  };
+
+  return el;
 }
