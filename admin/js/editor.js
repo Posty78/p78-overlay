@@ -48,6 +48,10 @@ const MULTI_INSTANCE_TYPES = new Set(["iframe", "battery"]);
 const CROPPABLE_TYPES = new Set([
   "iframe", "watermark", "roue", "compteur", "defis", "dons", "subgoal", "giveaway", "sondage",
 ]);
+// Widgets externes "natifs" (URL fixee en dur) - ont un bouton Demo comme le
+// type iframe generique, mais bascule un simple booleen elConfig.demo au lieu
+// de modifier une URL stockee (il n'y en a pas ici, elle est dans le code).
+const PROXY_NATIVE_TYPES = new Set(["roue", "compteur", "defis", "dons", "subgoal", "giveaway", "sondage"]);
 
 const DEFAULT_ELEMENTS = [
   { id: "clock", type: "clock", x: 1750, y: 30, scale: 1, visible: true },
@@ -692,6 +696,18 @@ function renderElementList() {
         });
         details.appendChild(btnDemo);
       }
+    }
+
+    if (PROXY_NATIVE_TYPES.has(el.type)) {
+      const btnDemo = document.createElement("button");
+      btnDemo.textContent = el.demo ? "Démo : ON" : "Démo : OFF";
+      btnDemo.addEventListener("click", () => {
+        el.demo = !el.demo;
+        persistElements();
+        renderCanvas();
+        renderElementList();
+      });
+      details.appendChild(btnDemo);
     }
 
     if (el.type === "battery") {

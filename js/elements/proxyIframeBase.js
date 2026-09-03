@@ -20,8 +20,13 @@ export function makeProxyIframe(fixedUrl, defaultW = 400, defaultH = 300) {
     el.style.width = `${w}px`;
     el.style.height = `${h}px`;
 
-    if (el.dataset.currentUrl === fixedUrl) return;
-    el.dataset.currentUrl = fixedUrl;
+    // demo=1 doit rester un parametre de PREMIER niveau sur l'URL du proxy
+    // (pas cache dans l'URL cible encodee) - le proxy le reinjecte lui-meme
+    // cote serveur via history.replaceState.
+    const url = elConfig?.demo ? `${fixedUrl}${fixedUrl.includes("?") ? "&" : "?"}demo=1` : fixedUrl;
+
+    if (el.dataset.currentUrl === url) return;
+    el.dataset.currentUrl = url;
 
     if (el._watchdogTimer) {
       clearInterval(el._watchdogTimer);
@@ -30,7 +35,7 @@ export function makeProxyIframe(fixedUrl, defaultW = 400, defaultH = 300) {
 
     el.innerHTML = "";
     const iframe = document.createElement("iframe");
-    iframe.src = fixedUrl;
+    iframe.src = url;
     iframe.style.width = "100%";
     iframe.style.height = "100%";
     iframe.style.border = "none";
@@ -40,7 +45,7 @@ export function makeProxyIframe(fixedUrl, defaultW = 400, defaultH = 300) {
 
     el._watchdogTimer = setInterval(() => {
       const current = el.querySelector("iframe");
-      if (current) current.src = fixedUrl;
+      if (current) current.src = url;
     }, WATCHDOG_INTERVAL_MS);
   }
 
