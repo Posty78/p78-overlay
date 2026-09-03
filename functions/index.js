@@ -1,6 +1,21 @@
 const { onRequest } = require("firebase-functions/v2/https");
 const { defineSecret } = require("firebase-functions/params");
 const admin = require("firebase-admin");
+const crypto = require("crypto");
+
+// Comparaison en temps constant (pas de court-circuit au 1er caractere
+// different) - une comparaison "!==" classique laisse fuir, via le temps de
+// reponse, le nombre de caracteres corrects, ce qui permettrait en theorie de
+// deviner un secret petit a petit.
+function safeEqual(a, b) {
+  const bufA = Buffer.from(String(a ?? ""));
+  const bufB = Buffer.from(String(b ?? ""));
+  if (bufA.length !== bufB.length) {
+    crypto.timingSafeEqual(bufA, bufA); // meme cout que le cas egal, pour ne pas fuir la longueur non plus
+    return false;
+  }
+  return crypto.timingSafeEqual(bufA, bufB);
+}
 
 admin.initializeApp();
 const db = admin.firestore();
@@ -42,7 +57,7 @@ exports.commandWebhook = onRequest(
   { region: "europe-west1", secrets: [COMMAND_SECRET], cors: true, maxInstances: 10 },
   async (req, res) => {
     const providedSecret = req.get("x-overlay-secret") || req.query.key;
-    if (providedSecret !== COMMAND_SECRET.value()) {
+    if (!safeEqual(providedSecret, COMMAND_SECRET.value())) {
       res.status(403).json({ ok: false, error: "invalid secret" });
       return;
     }
