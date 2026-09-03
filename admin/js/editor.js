@@ -59,7 +59,6 @@ let selectedElementId = null;
 let dragReorderEnabled = false;
 
 export async function initEditor() {
-  await ensureSeedData();
   await loadSceneList();
 
   populateAddTypeSelect();
@@ -95,13 +94,6 @@ export async function initEditor() {
   if (firstId) selectScene(firstId);
 }
 
-async function ensureSeedData() {
-  const scenesSnap = await getDocs(collection(db, "scenes"));
-  if (!scenesSnap.empty) return;
-
-  await setDoc(doc(db, "scenes", "gta"), { name: "GTA", elements: DEFAULT_ELEMENTS });
-  await setDoc(doc(db, "settings", "active"), { activeSceneId: "gta" });
-}
 
 async function loadSceneList() {
   const snap = await getDocs(collection(db, "scenes"));
