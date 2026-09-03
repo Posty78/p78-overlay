@@ -54,6 +54,3 @@ html, body {
   object-fit: cover;
   display: block;
 }
-
-/* Le style du widget Regis (.hud-peplink*) vit desormais dans hud-elements.css,
-   comme tous les autres widgets - overlay.css n'a que le layout de scene. */
