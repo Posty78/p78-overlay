@@ -12,8 +12,15 @@ import * as minimap from "../../js/elements/minimap.js?v=1";
 import * as iframe from "../../js/elements/iframe.js?v=2";
 import * as watermark from "../../js/elements/watermark.js?v=2";
 import * as weather from "../../js/elements/weather.js?v=1";
+import * as roue from "../../js/elements/roue.js?v=1";
+import * as compteur from "../../js/elements/compteur.js?v=1";
+import * as defis from "../../js/elements/defis.js?v=1";
+import * as dons from "../../js/elements/dons.js?v=1";
 
-const ELEMENT_MODULES = { clock, battery, money, stars, weapon, minimap, iframe, watermark, weather };
+const ELEMENT_MODULES = {
+  clock, battery, money, stars, weapon, minimap, iframe, watermark, weather,
+  roue, compteur, defis, dons,
+};
 const TYPE_LABELS = {
   clock: "Horloge (+ barres)",
   battery: "Batterie / Temp",
@@ -24,11 +31,15 @@ const TYPE_LABELS = {
   iframe: "Widget externe (URL)",
   watermark: "Filigrane (PNG)",
   weather: "Météo (ville + temp)",
+  roue: "Roue",
+  compteur: "Compteur",
+  defis: "Vote Défis",
+  dons: "Barre de don Restos du Cœur",
 };
 const MULTI_INSTANCE_TYPES = new Set(["iframe", "battery"]);
 // Types avec une vraie largeur/hauteur configurable (donc "recadrables", au sens
 // OBS du terme) plutot qu'un simple zoom uniforme via l'echelle.
-const CROPPABLE_TYPES = new Set(["iframe", "watermark"]);
+const CROPPABLE_TYPES = new Set(["iframe", "watermark", "roue", "compteur", "defis", "dons"]);
 
 const DEFAULT_ELEMENTS = [
   { id: "clock", type: "clock", x: 1750, y: 30, scale: 1, visible: true },
