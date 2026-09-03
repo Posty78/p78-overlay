@@ -145,6 +145,12 @@ input:focus, select:focus { outline: 1.5px solid #3b82f6; border-color: #3b82f6;
 }
 .editor-el--selected .editor-el__label { background: #3b82f6; }
 
+/* Widget verrouille (cadenas) : plus de contour pointille ni de poignees de
+   redimensionnement/deplacement - juste le widget lui-meme, pour ne plus
+   encombrer visuellement le canvas une fois la position figee. */
+.editor-el--locked { outline: none; cursor: default; }
+.editor-el--locked .editor-el__resize-handle { display: none; }
+
 .editor-el__resize-handle {
   position: absolute;
   width: 16px;
@@ -275,6 +281,25 @@ section.panel.is-collapsed > :not(h2) { display: none; }
 .icon-btn--danger:hover { background: #7f1d1d; color: #fff; }
 .icon-btn--on { color: #4ade80; }
 .icon-btn--off { color: #575c65; }
+.icon-btn--locked { color: #fbbf24; }
+
+.reorder-toggle {
+  width: 100%;
+  margin-bottom: 8px;
+  background: #21242b;
+  color: #b7bdc6;
+  border: 1px solid #22252c;
+  border-radius: 7px;
+  padding: 7px 10px;
+  font-size: 12px;
+  cursor: pointer;
+}
+.reorder-toggle:hover { background: #333844; color: #fff; }
+.reorder-toggle.is-active { background: #3b82f6; color: #fff; border-color: #3b82f6; }
+
+.element-row[draggable="true"] { cursor: grab; }
+.element-row[draggable="true"]:active { cursor: grabbing; }
+.element-row--drag-over { border-color: #3b82f6; box-shadow: 0 -2px 0 0 #3b82f6 inset; }
 
 .element-row__details {
   display: none;

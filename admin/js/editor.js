@@ -56,6 +56,7 @@ let stageScale = 1;
 let mountedNodes = {}; // id -> { wrapper, node, type }
 let latestGtaState = {};
 let selectedElementId = null;
+let dragReorderEnabled = false;
 
 export async function initEditor() {
   await ensureSeedData();
@@ -69,6 +70,16 @@ export async function initEditor() {
   document.getElementById("btn-activate-scene").addEventListener("click", onActivateScene);
   document.getElementById("btn-add-element").addEventListener("click", onAddElement);
   sceneSelect.addEventListener("change", () => selectScene(sceneSelect.value));
+
+  const btnToggleReorder = document.getElementById("btn-toggle-reorder");
+  btnToggleReorder.addEventListener("click", () => {
+    dragReorderEnabled = !dragReorderEnabled;
+    btnToggleReorder.textContent = dragReorderEnabled
+      ? "Désactiver le glisser-déposer"
+      : "Activer le glisser-déposer (ordre d'affichage)";
+    btnToggleReorder.classList.toggle("is-active", dragReorderEnabled);
+    renderElementList();
+  });
 
   onSnapshot(doc(db, "settings", "active"), (snap) => {
     activeSceneId = snap.data()?.activeSceneId || null;
@@ -189,6 +200,31 @@ function toggleVisible(id) {
   renderElementList();
 }
 
+function toggleLocked(id) {
+  const el = currentElements.find((e) => e.id === id);
+  if (!el) return;
+  el.locked = !el.locked;
+  persistElements();
+  renderCanvas();
+  renderElementList();
+}
+
+// Reordonne currentElements (l'ordre du tableau = l'ordre d'empilement a
+// l'affichage, le dernier element etant dessine par-dessus les autres) et
+// persiste - active uniquement quand le glisser-deposer est active (bouton
+// en haut de la liste), pour eviter les reordonnancements accidentels.
+function moveElement(fromId, toId) {
+  if (fromId === toId) return;
+  const fromIndex = currentElements.findIndex((e) => e.id === fromId);
+  const toIndex = currentElements.findIndex((e) => e.id === toId);
+  if (fromIndex === -1 || toIndex === -1) return;
+  const [moved] = currentElements.splice(fromIndex, 1);
+  currentElements.splice(toIndex, 0, moved);
+  persistElements();
+  renderCanvas();
+  renderElementList();
+}
+
 function setElementPosition(id, x, y) {
   const el = currentElements.find((e) => e.id === id);
   if (!el) return;
@@ -273,19 +309,24 @@ function renderCanvas() {
     wrapper.style.transform = `scale(${elConfig.scale ?? 1})`;
     wrapper.dataset.visible = elConfig.visible !== false ? "true" : "false";
     wrapper.classList.toggle("editor-el--selected", elConfig.id === selectedElementId);
+    wrapper.classList.toggle("editor-el--locked", elConfig.locked === true);
 
-    wrapper.addEventListener("pointerdown", () => selectElement(elConfig.id, { rerenderList: true }));
-    wireDrag(wrapper, elConfig.id);
-    wireResize(wrapper, handle, elConfig.id, "br");
+    // Verrouille (cadenas) : ni deplacement ni redimensionnement, et les
+    // poignees/contour pointille sont masques en CSS (.editor-el--locked).
+    if (!elConfig.locked) {
+      wrapper.addEventListener("pointerdown", () => selectElement(elConfig.id, { rerenderList: true }));
+      wireDrag(wrapper, elConfig.id);
+      wireResize(wrapper, handle, elConfig.id, "br");
 
-    // 2eme poignee (coin oppose) uniquement pour les types recadrables : permet
-    // de recadrer depuis le coin le plus pratique sans avoir a viser toujours
-    // le meme, ni a se souvenir de la combinaison Alt.
-    if (CROPPABLE_TYPES.has(elConfig.type)) {
-      const handleTL = document.createElement("div");
-      handleTL.className = "editor-el__resize-handle editor-el__resize-handle--tl";
-      wrapper.appendChild(handleTL);
-      wireResize(wrapper, handleTL, elConfig.id, "tl");
+      // 2eme poignee (coin oppose) uniquement pour les types recadrables : permet
+      // de recadrer depuis le coin le plus pratique sans avoir a viser toujours
+      // le meme, ni a se souvenir de la combinaison Alt.
+      if (CROPPABLE_TYPES.has(elConfig.type)) {
+        const handleTL = document.createElement("div");
+        handleTL.className = "editor-el__resize-handle editor-el__resize-handle--tl";
+        wrapper.appendChild(handleTL);
+        wireResize(wrapper, handleTL, elConfig.id, "tl");
+      }
     }
 
     stage.appendChild(wrapper);
@@ -453,6 +494,25 @@ function renderElementList() {
     const row = document.createElement("div");
     row.className = "element-row" + (el.id === selectedElementId ? " element-row--selected" : "");
 
+    if (dragReorderEnabled) {
+      row.draggable = true;
+      row.addEventListener("dragstart", (e) => {
+        e.dataTransfer.setData("text/plain", el.id);
+        e.dataTransfer.effectAllowed = "move";
+      });
+      row.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        row.classList.add("element-row--drag-over");
+      });
+      row.addEventListener("dragleave", () => row.classList.remove("element-row--drag-over"));
+      row.addEventListener("drop", (e) => {
+        e.preventDefault();
+        row.classList.remove("element-row--drag-over");
+        const fromId = e.dataTransfer.getData("text/plain");
+        moveElement(fromId, el.id);
+      });
+    }
+
     // --- Ligne principale : nom + visibilité + détails + suppr ---
     const header = document.createElement("div");
     header.className = "element-row__header";
@@ -470,6 +530,15 @@ function renderElementList() {
     btnVisible.textContent = el.visible === false ? "◌" : "●";
     btnVisible.addEventListener("click", () => toggleVisible(el.id));
     header.appendChild(btnVisible);
+
+    const btnLock = document.createElement("button");
+    btnLock.className = "icon-btn " + (el.locked ? "icon-btn--locked" : "");
+    btnLock.title = el.locked
+      ? "Déverrouiller (réafficher les poignées de position/taille)"
+      : "Verrouiller la position (masque les poignées sur le canvas)";
+    btnLock.textContent = el.locked ? "🔒" : "🔓";
+    btnLock.addEventListener("click", () => toggleLocked(el.id));
+    header.appendChild(btnLock);
 
     const hasDetails = true; // taille + réglages spécifiques, toujours au moins la taille
     let btnToggle;
