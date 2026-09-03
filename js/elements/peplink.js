@@ -11,7 +11,10 @@ import { db } from "../firebase-init.js?v=1";
 // PostyMonitor sur le telephone de stream, qui les pousse dans
 // state/peplink_result des qu'un declenchement est detecte - ce widget se
 // contente d'ecouter ce document en direct, aucun appel reseau de sa part.
-const VISIBLE_DURATION_MS = 15000;
+// Le telephone scanne activement pendant 20s (SCAN_DURATION_MS cote APK) :
+// on reste visible un peu plus longtemps pour ne jamais disparaitre avant
+// la fin du scan.
+const VISIBLE_DURATION_MS = 22000;
 
 export function mountPeplink() {
   const el = document.createElement("div");

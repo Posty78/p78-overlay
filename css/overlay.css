@@ -56,8 +56,10 @@ html, body {
 }
 
 /* Widget de supervision réseau Peplink (!regis) : comme le masque de censure,
-   hors du système de scènes, toujours monté, visible seulement 15s après
-   déclenchement (voir peplink.js). */
+   hors du système de scènes, toujours monté, visible seulement le temps du
+   scan (voir VISIBLE_DURATION_MS dans peplink.js). Liste verticale : jusqu'à
+   6 lignes (4 WAN Peplink + Données mobile + Starlink) empilées de haut en
+   bas, jamais serré horizontalement meme avec des libelles longs. */
 .hud-peplink {
   position: absolute;
   top: 40px;
@@ -66,12 +68,12 @@ html, body {
   z-index: 999998;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
   gap: 10px;
   background: rgba(10, 10, 10, 0.85);
   border: 1px solid rgba(255, 255, 255, 0.14);
   border-radius: 10px;
-  padding: 14px 26px;
+  padding: 16px 26px;
   opacity: 0;
   pointer-events: none;
   transition: opacity 0.35s ease, transform 0.35s ease;
@@ -86,15 +88,17 @@ html, body {
   font-size: 15px;
   letter-spacing: 0.2em;
   color: #ffffff;
+  text-align: center;
 }
 .hud-peplink__lines {
   display: flex;
-  gap: 20px;
+  flex-direction: column;
+  gap: 8px;
 }
 .hud-peplink__line {
   display: flex;
   align-items: center;
-  gap: 8px;
+  gap: 10px;
 }
 .hud-peplink__dot {
   width: 12px;
@@ -108,24 +112,31 @@ html, body {
 .hud-peplink__dot--red { background: #e0263f; color: #e0263f; }
 .hud-peplink__info {
   display: flex;
-  flex-direction: column;
-  line-height: 1.15;
+  align-items: baseline;
+  gap: 10px;
+  min-width: 0;
 }
 .hud-peplink__carrier {
   font-family: "Teko", sans-serif;
   font-weight: 600;
-  font-size: 22px;
+  font-size: 20px;
   color: #ffffff;
   text-transform: uppercase;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  max-width: 260px;
 }
 .hud-peplink__mbps {
   font-family: "Rajdhani", sans-serif;
   font-weight: 600;
   font-size: 13px;
   color: rgba(255, 255, 255, 0.6);
+  white-space: nowrap;
 }
 .hud-peplink__empty {
   font-family: "Teko", sans-serif;
   font-size: 18px;
   color: rgba(255, 255, 255, 0.6);
+  text-align: center;
 }

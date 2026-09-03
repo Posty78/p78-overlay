@@ -151,7 +151,7 @@ exports.commandWebhook = onRequest(
 );
 
 // Domaines autorisés à être proxifiés (évite d'exposer un proxy ouvert exploitable).
-const ALLOWED_PROXY_HOSTS = ["posty78.fr"];
+const ALLOWED_PROXY_HOSTS = ["posty78.fr", "regis.posty78.fr"];
 
 // Sert un widget externe qui bloque son intégration en iframe (X-Frame-Options/CSP) sans
 // toucher au serveur source : récupère la page côté serveur, ne retransmet pas ces en-têtes,
