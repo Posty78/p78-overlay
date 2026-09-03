@@ -10,6 +10,13 @@ service cloud.firestore {
       ];
     }
 
+    // Compte dedie a la page admin regis.posty78.fr (projet "Regis"), separe des
+    // 2 admins principaux - un login cree expres pour ca, sans lien avec le reste
+    // du panel overlay.
+    function isRegisAdmin() {
+      return request.auth != null && request.auth.uid == "87gtn4etsRRljdoHqzcgF5Qkwtr1";
+    }
+
     // Scènes et positionnement des éléments : lecture publique (overlay OBS non authentifié),
     // écriture réservée aux 2 admins.
     match /scenes/{sceneId} {
@@ -33,6 +40,29 @@ service cloud.firestore {
     match /state/{docId} {
       allow read: if true;
       allow write: if isAdmin();
+    }
+
+    // --- Projet "Regis" (supervision reseau Peplink/wifi) ---
+    // state/peplink : horodatage de declenchement (!regis via le bot, OU bouton
+    // manuel sur regis.posty78.fr). Ecrit aussi par commandWebhook via Admin SDK
+    // (contourne ces regles), donc l'ecriture ici ne sert qu'au bouton manuel.
+    match /state/peplink {
+      allow read: if true;
+      allow write: if isAdmin() || isRegisAdmin();
+    }
+    // state/peplink_result : dernier resultat de scrap pousse par l'APK PostyMonitor
+    // (authentifie anonyme, comme l'APK de tracking GPS - pas de compte dedie possible
+    // sur un service Android en arriere-plan).
+    match /state/peplink_result {
+      allow read: if true;
+      allow write: if request.auth != null;
+    }
+    // peplink_history : historique des checks, prive (visible uniquement sur
+    // regis.posty78.fr), ecrit par l'APK apres chaque scrap.
+    match /peplink_history/{entryId} {
+      allow read: if isAdmin() || isRegisAdmin();
+      allow create: if request.auth != null;
+      allow update, delete: if false;
     }
   }
 }
