@@ -13,11 +13,12 @@ import * as roue from "./elements/roue.js?v=1";
 import * as compteur from "./elements/compteur.js?v=1";
 import * as defis from "./elements/defis.js?v=1";
 import * as dons from "./elements/dons.js?v=1";
+import * as subgoal from "./elements/subgoal.js?v=1";
 import { mountCensure } from "./elements/censure.js?v=1";
 
 const ELEMENTS = {
   clock, battery, money, stars, weapon, minimap, iframe, watermark, weather,
-  roue, compteur, defis, dons,
+  roue, compteur, defis, dons, subgoal,
 };
 
 // Hors systeme de scenes expres : doit pouvoir masquer n'importe quelle scene active.
