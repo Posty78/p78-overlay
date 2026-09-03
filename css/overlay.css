@@ -106,12 +106,23 @@ html, body {
 .hud-peplink__dot--green { background: #2ecc40; color: #2ecc40; }
 .hud-peplink__dot--orange { background: #ffab00; color: #ffab00; }
 .hud-peplink__dot--red { background: #e0263f; color: #e0263f; }
+.hud-peplink__info {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.15;
+}
 .hud-peplink__carrier {
   font-family: "Teko", sans-serif;
   font-weight: 600;
   font-size: 22px;
   color: #ffffff;
   text-transform: uppercase;
+}
+.hud-peplink__mbps {
+  font-family: "Rajdhani", sans-serif;
+  font-weight: 600;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.6);
 }
 .hud-peplink__empty {
   font-family: "Teko", sans-serif;

@@ -273,125 +273,14 @@ exports.weatherProxy = onRequest(
 );
 
 // ---------------------------------------------------------------------------
-// SUPERVISION RESEAU PEPLINK (widget "!regis")
+// PROJET "REGIS" (supervision reseau) : plus de Cloud Function ici.
 // ---------------------------------------------------------------------------
-// Cle API InControl2 (Client ID/Secret) gardee exclusivement cote serveur :
-// le widget OBS n'appelle QUE cette Cloud Function et ne voit jamais ces
-// valeurs. Doc officielle : https://www.peplink.com/ic2-api-doc/
-//
-// IMPORTANT : les noms exacts des champs JSON renvoyes par l'API InControl2
-// (carrier_name, signal_bar, status, structure data/list...) proviennent de la
-// documentation publique, jamais verifies contre un appel reel (aucune cle
-// API n'a jamais transite dans cette session). Un premier essai en conditions
-// reelles pourra reveler un nom de champ legerement different a corriger dans
-// les logs Cloud Functions le cas echeant.
-const PEPLINK_CLIENT_ID = defineSecret("PEPLINK_CLIENT_ID");
-const PEPLINK_CLIENT_SECRET = defineSecret("PEPLINK_CLIENT_SECRET");
-const PEPLINK_API_BASE = "https://api.ic.peplink.com";
-
-// Noms non sensibles servant a retrouver automatiquement l'organisation et
-// l'appareil, pour ne pas avoir a configurer d'identifiants numeriques a la
-// main (et pour survivre a un renommage mineur de l'un ou l'autre).
-const PEPLINK_ORG_NAME = "Posty78";
-const PEPLINK_DEVICE_MATCH = "FusionHub";
-
-// Cache memoire (par instance de fonction chaude) du token OAuth2 et de l'ID
-// d'organisation : evite de re-authentifier / re-resoudre l'org a chaque appel
-// du widget pendant les 15s d'affichage.
-let peplinkTokenCache = { token: null, expiresAt: 0 };
-let peplinkOrgCache = { orgId: null, at: 0 };
-const PEPLINK_ORG_TTL_MS = 60 * 60 * 1000; // 1h, l'ID d'organisation ne change quasi jamais
-
-function extractArray(json) {
-  if (Array.isArray(json)) return json;
-  return json?.data || json?.list || [];
-}
-
-async function getPeplinkToken() {
-  if (peplinkTokenCache.token && Date.now() < peplinkTokenCache.expiresAt) {
-    return peplinkTokenCache.token;
-  }
-  const res = await fetch(`${PEPLINK_API_BASE}/api/oauth2/token`, {
-    method: "POST",
-    headers: { "Content-Type": "application/x-www-form-urlencoded" },
-    body: new URLSearchParams({
-      client_id: PEPLINK_CLIENT_ID.value(),
-      client_secret: PEPLINK_CLIENT_SECRET.value(),
-      grant_type: "client_credentials",
-    }),
-  });
-  const data = await res.json();
-  if (!data.access_token) throw new Error("token Peplink refusé : " + JSON.stringify(data));
-  // Marge de sécurité de 60s avant l'expiration réelle du token.
-  peplinkTokenCache = {
-    token: data.access_token,
-    expiresAt: Date.now() + (data.expires_in ?? 3000) * 1000 - 60000,
-  };
-  return peplinkTokenCache.token;
-}
-
-async function getPeplinkOrgId(token) {
-  if (peplinkOrgCache.orgId && Date.now() - peplinkOrgCache.at < PEPLINK_ORG_TTL_MS) {
-    return peplinkOrgCache.orgId;
-  }
-  const res = await fetch(`${PEPLINK_API_BASE}/rest/o`, {
-    headers: { Authorization: `Bearer ${token}` },
-  });
-  const orgs = extractArray(await res.json());
-  const org =
-    orgs.find((o) => (o.name || "").toLowerCase().includes(PEPLINK_ORG_NAME.toLowerCase())) ||
-    orgs[0];
-  if (!org) throw new Error("organisation Peplink introuvable");
-  peplinkOrgCache = { orgId: org.id, at: Date.now() };
-  return org.id;
-}
-
-// vert : ligne connectée avec un signal correct. orange : connectée mais signal
-// faible. rouge : déconnectée, désactivée ou pas de carte SIM détectée.
-function peplinkColorFor(status, signalBar) {
-  if (status !== "Connected") return "red";
-  if (typeof signalBar === "number" && signalBar <= 2) return "orange";
-  return "green";
-}
-
-exports.peplinkStatus = onRequest(
-  { region: "europe-west1", secrets: [PEPLINK_CLIENT_ID, PEPLINK_CLIENT_SECRET], cors: true },
-  async (req, res) => {
-    try {
-      const token = await getPeplinkToken();
-      const orgId = await getPeplinkOrgId(token);
-
-      const devicesRes = await fetch(`${PEPLINK_API_BASE}/rest/o/${orgId}/d?has_status=true`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const devices = extractArray(await devicesRes.json());
-      const device =
-        devices.find((d) =>
-          `${d.name || ""} ${d.description || ""}`
-            .toLowerCase()
-            .includes(PEPLINK_DEVICE_MATCH.toLowerCase())
-        ) || devices[0];
-
-      if (!device) {
-        res.status(404).json({ ok: false, error: "appareil Peplink introuvable" });
-        return;
-      }
-
-      const wanInterfaces = (device.interfaces || []).filter((i) => i.status);
-      const lines = wanInterfaces.map((iface) => ({
-        carrier: iface.carrier_name || iface.name || "Ligne",
-        status: iface.status || "Unknown",
-        signalBar: typeof iface.signal_bar === "number" ? iface.signal_bar : null,
-        color: peplinkColorFor(iface.status, iface.signal_bar),
-      }));
-
-      res.json({ ok: true, lines });
-    } catch (err) {
-      console.error("[peplinkStatus] erreur:", err);
-      res.status(502).json({ ok: false, error: err.message });
-    }
-  }
-);
+// L'API cloud InControl2 (peplinkStatus, retiree) ne pouvait pas donner de vrai
+// Mbps par ligne (verifie en conditions reelles - limite documentee du cote
+// Peplink). La supervision reseau passe maintenant par l'APK PostyMonitor, qui
+// scrape en local (Peplink ou wifi generique selon detection) et pousse les
+// resultats directement dans Firestore (state/peplink_result) : le widget
+// overlay et regis.posty78.fr lisent ce document, sans intermediaire ici.
 
 // Appelée depuis le panel admin (bouton reset). Auth requise : ID token Firebase d'un UID whitelisté.
 exports.resetState = onRequest({ region: "europe-west1", cors: true }, async (req, res) => {
