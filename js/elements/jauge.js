@@ -104,7 +104,7 @@ export function create() {
 
       <!-- Petit cadran essence imbrique, meme disposition que le vrai combine -->
       <circle cx="${FUEL_CX}" cy="${FUEL_CY}" r="${FUEL_R}" class="hud-jauge__fuel-bg"/>
-      ${buildTicks({ cx: FUEL_CX, cy: FUEL_CY, r: FUEL_R, angleMin: FUEL_ANGLE_MIN, angleMax: FUEL_ANGLE_MAX, min: 0, max: 100, fontSize: 12, labels: [{ value: 0, text: "E" }, { value: 50, text: "½" }, { value: 100, text: "F" }] })}
+      ${buildTicks({ cx: FUEL_CX, cy: FUEL_CY, r: FUEL_R, angleMin: FUEL_ANGLE_MIN, angleMax: FUEL_ANGLE_MAX, min: 0, max: 100, minorStep: 100 / 7, fontSize: 12, labels: [{ value: 0, text: "E" }, { value: 50, text: "½" }, { value: 100, text: "F" }] })}
       ${PUMP_ICON}
       ${buildNeedle("jauge-needle-fuel", FUEL_CX, FUEL_CY, FUEL_R - 16, 8, 2)}
       <circle cx="${FUEL_CX}" cy="${FUEL_CY}" r="4" class="hud-jauge__cap"/>
