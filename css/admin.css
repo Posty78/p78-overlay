@@ -150,6 +150,7 @@ input:focus, select:focus { outline: 1.5px solid #3b82f6; border-color: #3b82f6;
    encombrer visuellement le canvas une fois la position figee. */
 .editor-el--locked { outline: none; cursor: default; }
 .editor-el--locked .editor-el__resize-handle { display: none; }
+.editor-el--locked .editor-el__label { display: none; }
 
 .editor-el__resize-handle {
   position: absolute;
