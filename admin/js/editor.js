@@ -598,78 +598,12 @@ function renderElementList() {
       details.appendChild(labelInput);
     }
 
-    // Positionnement au clavier (X/Y exacts) : indispensable quand deux widgets se
-    // superposent presque totalement sur le canvas et qu'il devient difficile de les
-    // ecarter uniquement a la souris.
-    const posRow = document.createElement("div");
-    posRow.className = "detail-field";
-    const xInput = document.createElement("input");
-    xInput.type = "number";
-    xInput.value = Math.round(el.x);
-    xInput.addEventListener("change", () => {
-      setElementPosition(el.id, Number(xInput.value), el.y);
-      persistElements();
-      renderCanvas();
-    });
-    const yInput = document.createElement("input");
-    yInput.type = "number";
-    yInput.value = Math.round(el.y);
-    yInput.addEventListener("change", () => {
-      setElementPosition(el.id, el.x, Number(yInput.value));
-      persistElements();
-      renderCanvas();
-    });
-    posRow.appendChild(document.createTextNode("X"));
-    posRow.appendChild(xInput);
-    posRow.appendChild(document.createTextNode("Y"));
-    posRow.appendChild(yInput);
-    details.appendChild(posRow);
-
-    const scaleRow = document.createElement("div");
-    scaleRow.className = "detail-field";
-    const scaleInput = document.createElement("input");
-    scaleInput.type = "number";
-    scaleInput.min = "0.2";
-    scaleInput.max = "4";
-    scaleInput.step = "0.1";
-    scaleInput.value = el.scale ?? 1;
-    scaleInput.addEventListener("change", () => {
-      setElementScale(el.id, Number(scaleInput.value));
-      persistElements();
-      renderCanvas();
-    });
-    scaleRow.appendChild(document.createTextNode("Taille"));
-    scaleRow.appendChild(scaleInput);
-    details.appendChild(scaleRow);
+    // Position/taille/dimensions : plus de champs numeriques ici, tout se fait a la
+    // souris sur le canvas (drag pour la position, poignees pour le redimensionnement) -
+    // les valeurs restent lues/ecrites via setElementPosition/setElementScale/el.w/el.h,
+    // seule l'UI de saisie manuelle a ete retiree.
 
     if (CROPPABLE_TYPES.has(el.type)) {
-      const defaultW = el.type === "watermark" ? 260 : 400;
-      const defaultH = el.type === "watermark" ? 100 : 300;
-
-      const sizeRow = document.createElement("div");
-      sizeRow.className = "detail-field";
-      const wInput = document.createElement("input");
-      wInput.type = "number";
-      wInput.value = el.w ?? defaultW;
-      wInput.addEventListener("change", () => {
-        el.w = Number(wInput.value);
-        persistElements();
-        renderCanvas();
-      });
-      const hInput = document.createElement("input");
-      hInput.type = "number";
-      hInput.value = el.h ?? defaultH;
-      hInput.addEventListener("change", () => {
-        el.h = Number(hInput.value);
-        persistElements();
-        renderCanvas();
-      });
-      sizeRow.appendChild(document.createTextNode("L"));
-      sizeRow.appendChild(wInput);
-      sizeRow.appendChild(document.createTextNode("H"));
-      sizeRow.appendChild(hInput);
-      details.appendChild(sizeRow);
-
       const cropHint = document.createElement("div");
       cropHint.className = "hint";
       cropHint.textContent = "Astuce : glisse le rond bleu en bas à droite pour recadrer depuis ce coin, ou celui en haut à gauche pour recadrer depuis l'autre coin (comme OBS, sans zoomer le contenu).";
