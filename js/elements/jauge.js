@@ -5,11 +5,14 @@ import { mapsDb, mapsRtdb } from "../firebase-init.js?v=1";
 // Deux cadrans distincts cote a cote : jauge essence a gauche (aiguille/graduations
 // blanches, pompe + "1/2" en haut - modele du petit cadran essence separe, pas le
 // combine tr/min+essence), compteur vitesse a droite (repris tel quel, deja valide).
-const FUEL_CX = 115, FUEL_CY = 210, FUEL_R = 95;
+const FUEL_CX = 140, FUEL_CY = 205, FUEL_R = 105;
 const FUEL_ANGLE_MIN = -100, FUEL_ANGLE_MAX = 100;
 const FUEL_MINOR_STEP = 100 / 7;
 
-const SPEED_CX = 340, SPEED_CY = 195, SPEED_R = 178;
+// Marge calculee sur les halos (glow) inclus, pas juste les cercles de face :
+// halo essence jusqu'a FUEL_CX+FUEL_R+16=261, halo vitesse a partir de
+// SPEED_CX-SPEED_R-20 -> avec SPEED_CX=490 ca demarre a 292, ~30px d'ecart net.
+const SPEED_CX = 490, SPEED_CY = 205, SPEED_R = 178;
 const SPEED_MIN = 0, SPEED_MAX = 200, SPEED_ANGLE_MIN = -120, SPEED_ANGLE_MAX = 120;
 const SPEED_MAJOR_STEP = 20, SPEED_MINOR_STEP = 10;
 
@@ -69,11 +72,15 @@ function buildNeedle(id, cx, cy, len, tailLen, width, cls) {
   `;
 }
 
-// Icone pompe a essence, posee en haut du cadran essence (comme sur la photo de reference).
+// Icone pompe a essence, tout pres du bord du cadran (comme sur la photo de
+// reference) - volontairement petite et collee au bezel pour ne jamais
+// chevaucher le repere "½" en dessous (voir marge verifiee dans le calcul de
+// buildTicks : le label est a une distance min de r - majorLen - fontSize du
+// centre, l'icone doit rester au-dela de ce rayon).
 const PUMP_ICON = `
-  <g transform="translate(${FUEL_CX - 8}, ${FUEL_CY - FUEL_R + 18})" class="hud-jauge__pump">
-    <rect x="0" y="0" width="13" height="16" rx="1.5"/>
-    <path d="M13,5 h5 a3,3 0 0 1 3,3 v9 a2.2,2.2 0 0 1 -4.4,0 v-5 h-3.6" fill="none" stroke-width="1.8"/>
+  <g transform="translate(${FUEL_CX - 5.5}, ${FUEL_CY - FUEL_R + 6})" class="hud-jauge__pump">
+    <rect x="0" y="0" width="11" height="12" rx="1.2"/>
+    <path d="M11,4 h4 a2.4,2.4 0 0 1 2.4,2.4 v6.6 a1.8,1.8 0 0 1 -3.6,0 v-3.6 h-2.8" fill="none" stroke-width="1.4"/>
   </g>
 `;
 
@@ -81,7 +88,7 @@ export function create() {
   const el = document.createElement("div");
   el.className = "hud-jauge";
   el.innerHTML = `
-    <svg viewBox="0 0 540 400" class="hud-jauge__svg">
+    <svg viewBox="0 0 710 420" class="hud-jauge__svg">
       <defs>
         <radialGradient id="jauge-face" cx="50%" cy="42%" r="70%">
           <stop offset="0%" stop-color="#232324"/>
@@ -113,7 +120,7 @@ export function create() {
       <circle cx="${SPEED_CX}" cy="${SPEED_CY}" r="9" class="hud-jauge__cap"/>
     </svg>
     <style>
-      .hud-jauge__svg { width: 540px; height: 400px; overflow: visible; filter: drop-shadow(0 0 12px rgba(255,90,31,0.35)); }
+      .hud-jauge__svg { width: 710px; height: 420px; overflow: visible; filter: drop-shadow(0 0 12px rgba(255,90,31,0.35)); }
       .hud-jauge__bezel { fill: #050505; stroke: #2b2b2b; stroke-width: 3px; }
       .hud-jauge__tick { stroke: #ff5a1f; }
       .hud-jauge__tick--major { stroke-width: 2.5px; }
