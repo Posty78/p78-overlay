@@ -22,6 +22,10 @@ const db = admin.firestore();
 
 const COMMAND_SECRET = defineSecret("COMMAND_SECRET");
 const WEATHER_API_KEY = defineSecret("WEATHER_API_KEY");
+// Secret partage avec les Cloud Functions posty78-maps (submitSpeed/updateFuel) -
+// distinct de COMMAND_SECRET, cote serveur-a-serveur uniquement (jamais transmis a Botsty78).
+const VEHICLE_SECRET = defineSecret("VEHICLE_SECRET");
+const VEHICLE_FUNCTIONS_BASE_URL = "https://europe-west1-posty78-maps.cloudfunctions.net";
 
 // UID Firebase Auth whitelistés (Jean-Didier + pote Botsty78)
 const ADMIN_UIDS = [
@@ -54,7 +58,7 @@ function isRateLimited(key, maxPerWindow) {
 // Appelée par Botsty78 (ou tout autre bot chat plus tard) sur chaque commande !argent / !etoile / !<arme>.
 // Protégée par une clé secrète fixe (COMMAND_SECRET) connue uniquement du bot.
 exports.commandWebhook = onRequest(
-  { region: "europe-west1", secrets: [COMMAND_SECRET], cors: true, maxInstances: 10 },
+  { region: "europe-west1", secrets: [COMMAND_SECRET, VEHICLE_SECRET], cors: true, maxInstances: 10 },
   async (req, res) => {
     const providedSecret = req.get("x-overlay-secret") || req.query.key;
     if (!safeEqual(providedSecret, COMMAND_SECRET.value())) {
@@ -162,6 +166,35 @@ exports.commandWebhook = onRequest(
           { merge: true }
         );
         res.json({ ok: true, command });
+        return;
+      }
+
+      // Jauge essence de la 206 (!jauge = valeur exacte en %, !essence = ajout de litres).
+      // La vitesse/l'essence vivent cote posty78-maps (meme projet que la position GPS
+      // et le calcul de distance parcourue dont l'essence a besoin) - on relaie donc
+      // l'appel vers la Cloud Function updateFuel de ce projet, avec un secret dedie.
+      if (command === "jauge" || command === "essence") {
+        const mode = command === "jauge" ? "set" : "add";
+        const body = mode === "set" ? { mode, value: args } : { mode, liters: args };
+
+        try {
+          const upstream = await fetch(`${VEHICLE_FUNCTIONS_BASE_URL}/updateFuel`, {
+            method: "POST",
+            headers: {
+              "Content-Type": "application/json",
+              "x-vehicle-secret": VEHICLE_SECRET.value(),
+            },
+            body: JSON.stringify(body),
+          });
+          const data = await upstream.json();
+          if (!upstream.ok || !data.ok) {
+            res.status(upstream.status || 500).json({ ok: false, error: data.error || "echec mise a jour essence" });
+            return;
+          }
+          res.json({ ok: true, command, fuelPercent: data.fuelPercent });
+        } catch (err) {
+          res.status(502).json({ ok: false, error: err.message });
+        }
         return;
       }
 

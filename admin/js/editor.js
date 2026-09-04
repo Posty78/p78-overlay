@@ -12,6 +12,7 @@ import * as minimap from "../../js/elements/minimap.js?v=1";
 import * as iframe from "../../js/elements/iframe.js?v=2";
 import * as watermark from "../../js/elements/watermark.js?v=2";
 import * as weather from "../../js/elements/weather.js?v=1";
+import * as jauge from "../../js/elements/jauge.js?v=1";
 import * as roue from "../../js/elements/roue.js?v=1";
 import * as compteur from "../../js/elements/compteur.js?v=1";
 import * as defis from "../../js/elements/defis.js?v=1";
@@ -21,7 +22,7 @@ import * as giveaway from "../../js/elements/giveaway.js?v=1";
 import * as sondage from "../../js/elements/sondage.js?v=1";
 
 const ELEMENT_MODULES = {
-  clock, battery, money, stars, weapon, minimap, iframe, watermark, weather,
+  clock, battery, money, stars, weapon, minimap, iframe, watermark, weather, jauge,
   roue, compteur, defis, dons, subgoal, giveaway, sondage,
 };
 const TYPE_LABELS = {
@@ -34,6 +35,7 @@ const TYPE_LABELS = {
   iframe: "Widget externe (URL)",
   watermark: "Filigrane (PNG)",
   weather: "Météo (ville + temp)",
+  jauge: "Jauge (vitesse + essence)",
   roue: "Roue",
   compteur: "Compteur",
   defis: "Vote Défis",
@@ -62,6 +64,7 @@ const DEFAULT_ELEMENTS = [
   { id: "minimap", type: "minimap", x: 40, y: 720, scale: 1, visible: true },
   { id: "weather", type: "weather", x: 90, y: 860, scale: 1, visible: true },
   { id: "watermark", type: "watermark", x: 830, y: 20, scale: 1, visible: true },
+  { id: "jauge", type: "jauge", x: 1440, y: 780, scale: 1, visible: true },
 ];
 
 const stage = document.getElementById("canvas-stage");
