@@ -65,17 +65,17 @@ export function create(elConfig) {
       <text x="${DIGITAL_CX}" y="${DIGITAL_CY + 65}" class="hud-jauge__unit hud-jauge__unit--digital">km/h</text>
     </svg>
     <style>
-      .hud-jauge__svg { width: 300px; height: 230px; overflow: visible; filter: drop-shadow(0 0 12px rgba(83,252,24,0.35)); }
+      .hud-jauge__svg { width: 300px; height: 230px; overflow: visible; filter: drop-shadow(0 0 12px rgba(255,90,31,0.35)); }
       .hud-jauge__digital {
         font-family: "Rajdhani", "Courier New", monospace; font-weight: 700; font-size: 135px;
-        fill: #53fc18; text-anchor: middle; dominant-baseline: middle;
-        filter: drop-shadow(0 0 10px rgba(83,252,24,0.9));
+        fill: #ff8a3d; text-anchor: middle; dominant-baseline: middle;
+        filter: drop-shadow(0 0 10px rgba(255,138,61,0.9));
       }
       .hud-jauge__unit {
         font-family: "Rajdhani", sans-serif; font-weight: 600; font-size: 15px;
-        fill: #53fc18; text-anchor: middle; opacity: 0.85;
+        fill: #ff8a3d; text-anchor: middle; opacity: 0.85;
       }
-      .hud-jauge__unit--digital { font-size: 22px; letter-spacing: 2px; }
+      .hud-jauge__unit--digital { font-size: 34px; letter-spacing: 2px; }
     </style>
   `;
   applyConfig(el, elConfig);

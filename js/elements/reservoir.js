@@ -86,8 +86,8 @@ export function create(elConfig) {
           <stop offset="100%" stop-color="#e8e8e8"/>
         </radialGradient>
         <radialGradient id="reservoir-glow" cx="50%" cy="50%" r="50%">
-          <stop offset="0%" stop-color="#53fc18" stop-opacity="0.5"/>
-          <stop offset="100%" stop-color="#53fc18" stop-opacity="0"/>
+          <stop offset="0%" stop-color="#ff8a3d" stop-opacity="0.5"/>
+          <stop offset="100%" stop-color="#ff8a3d" stop-opacity="0"/>
         </radialGradient>
       </defs>
 
@@ -102,25 +102,25 @@ export function create(elConfig) {
       <text x="${FUEL_CX}" y="300" class="hud-reservoir__title">RÉSERVOIR</text>
     </svg>
     <style>
-      .hud-reservoir__svg { width: 280px; height: 320px; overflow: visible; filter: drop-shadow(0 0 12px rgba(83,252,24,0.35)); }
+      .hud-reservoir__svg { width: 280px; height: 320px; overflow: visible; filter: drop-shadow(0 0 12px rgba(255,90,31,0.35)); }
       .hud-reservoir__title {
         font-family: "Rajdhani", sans-serif; font-weight: 700; font-size: 20px; letter-spacing: 3px;
-        fill: #53fc18; text-anchor: middle; opacity: 0.9;
+        fill: #ff8a3d; text-anchor: middle; opacity: 0.9;
       }
       .hud-reservoir__bezel { fill: #050505; stroke: #2b2b2b; stroke-width: 3px; }
       .hud-reservoir__tick { stroke: #111111; stroke-width: 2.5px; }
       .hud-reservoir__label {
         font-family: "Rajdhani", sans-serif; font-weight: 700;
-        fill: #53fc18; text-anchor: middle; dominant-baseline: middle;
+        fill: #ff8a3d; text-anchor: middle; dominant-baseline: middle;
       }
       .hud-reservoir__unit {
         font-family: "Rajdhani", sans-serif; font-weight: 600; font-size: 15px;
-        fill: #53fc18; text-anchor: middle; opacity: 0.85;
+        fill: #ff8a3d; text-anchor: middle; opacity: 0.85;
       }
       .hud-reservoir__unit--value { font-size: 22px; font-weight: 700; opacity: 1; }
       .hud-reservoir__needle-group polygon { fill: #111111; stroke: #000000; stroke-width: 0.6px; }
       .hud-reservoir__needle-group { filter: drop-shadow(0 0 3px rgba(0,0,0,0.5)); transition: transform 0.25s ease-out; }
-      .hud-reservoir__cap { fill: #111111; stroke: #53fc18; stroke-width: 1.5px; }
+      .hud-reservoir__cap { fill: #111111; stroke: #ff8a3d; stroke-width: 1.5px; }
     </style>
   `;
 
