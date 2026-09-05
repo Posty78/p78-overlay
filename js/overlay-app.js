@@ -34,9 +34,9 @@ let latestGtaState = {};
 let currentSceneId = null;
 let unsubScene = null;
 
-// Types masqués par !mapsoff (mini map + météo), independamment de leur
-// visibilite propre configuree dans la scene.
-const MAPS_WIDGET_TYPES = new Set(["minimap", "weather"]);
+// Types masqués par !mapsoff (mini map + météo + compteur km/h + réservoir),
+// independamment de leur visibilite propre configuree dans la scene.
+const MAPS_WIDGET_TYPES = new Set(["minimap", "weather", "jauge", "reservoir"]);
 let mapsHidden = false;
 
 onSnapshot(doc(db, "settings", "active"), (snap) => {
