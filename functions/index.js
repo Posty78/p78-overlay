@@ -229,6 +229,19 @@ exports.commandWebhook = onRequest(
         },
         { merge: true }
       );
+
+      // !volant = au volant de la 206 -> reaffiche mini map/meteo/compteur/reservoir.
+      // N'importe quelle AUTRE arme = sorti de la voiture -> les masque, pour une
+      // scene plus propre (meme flag mapsHidden que !mapson/!mapsoff, comportement
+      // strictement equivalent a taper la commande correspondante a la main).
+      await db.collection("state").doc("widgets").set(
+        {
+          mapsHidden: command !== "volant",
+          updatedAt: admin.firestore.FieldValue.serverTimestamp(),
+        },
+        { merge: true }
+      );
+
       res.json({ ok: true, command });
     } catch (err) {
       res.status(500).json({ ok: false, error: err.message });
