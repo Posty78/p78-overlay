@@ -84,8 +84,15 @@ exports.commandWebhook = onRequest(
       return;
     }
 
+    // Accents optionnels (ex: "etoile" et "étoile" doivent matcher tous les deux) -
+    // normalise en NFD puis retire les diacritiques, meme technique que la
+    // generation d'ID de scene cote admin (editor.js:onCreateScene).
     const payload = req.method === "POST" ? req.body : req.query;
-    const command = String(payload?.command || "").toLowerCase().replace(/^!/, "");
+    const command = String(payload?.command || "")
+      .toLowerCase()
+      .replace(/^!/, "")
+      .normalize("NFD")
+      .replace(/[̀-ͯ]/g, "");
     const args = payload?.args;
 
     if (!command) {
