@@ -91,9 +91,9 @@ export function create() {
       <circle cx="${FUEL_CX}" cy="${FUEL_CY}" r="${FUEL_R + 16}" fill="url(#jauge-glow)"/>
       <circle cx="${FUEL_CX}" cy="${FUEL_CY}" r="${FUEL_R + 8}" class="hud-jauge__bezel"/>
       <circle cx="${FUEL_CX}" cy="${FUEL_CY}" r="${FUEL_R}" fill="url(#jauge-face)"/>
-      ${buildTicks({ cx: FUEL_CX, cy: FUEL_CY, r: FUEL_R, angleMin: FUEL_ANGLE_MIN, angleMax: FUEL_ANGLE_MAX, min: 0, max: 100, step: FUEL_STEP, fontSize: 14, tickClass: "hud-jauge__tick--fuel", labels: [{ value: 0, text: "E" }, { value: 100, text: "F" }] })}
+      ${buildTicks({ cx: FUEL_CX, cy: FUEL_CY, r: FUEL_R, angleMin: FUEL_ANGLE_MIN, angleMax: FUEL_ANGLE_MAX, min: 0, max: 100, step: FUEL_STEP, fontSize: 14, tickClass: "hud-jauge__tick--fuel", labels: [{ value: 0, text: "R" }, { value: 100, text: "F" }] })}
       ${buildStandaloneLabel({ cx: FUEL_CX, cy: FUEL_CY, r: FUEL_R, angleMin: FUEL_ANGLE_MIN, angleMax: FUEL_ANGLE_MAX, min: 0, max: 100, value: 50, text: "½", fontSize: 14 })}
-      <text x="${FUEL_CX}" y="${FUEL_CY + 55}" class="hud-jauge__unit">%</text>
+      <text x="${FUEL_CX}" y="${FUEL_CY + 55}" id="jauge-fuel-digital" class="hud-jauge__unit hud-jauge__unit--fuel-value">0%</text>
       ${buildNeedle("jauge-needle-fuel", FUEL_CX, FUEL_CY, FUEL_R - 26, 14, 3, "hud-jauge__needle-group hud-jauge__needle-group--fuel")}
       <circle cx="${FUEL_CX}" cy="${FUEL_CY}" r="7" class="hud-jauge__cap hud-jauge__cap--fuel"/>
 
@@ -122,6 +122,7 @@ export function create() {
         fill: #ff8a3d; text-anchor: middle; opacity: 0.85;
       }
       .hud-jauge__unit--digital { font-size: 22px; letter-spacing: 2px; }
+      .hud-jauge__unit--fuel-value { font-size: 22px; font-weight: 700; opacity: 1; }
       .hud-jauge__needle-group--fuel polygon { fill: #f2f2f2; stroke: #8a8a8a; stroke-width: 0.6px; }
       .hud-jauge__needle-group--fuel { filter: drop-shadow(0 0 4px rgba(255,255,255,0.8)); }
       .hud-jauge__cap--fuel { fill: #050505; stroke: #d8d8d8; stroke-width: 1.5px; }
@@ -130,6 +131,7 @@ export function create() {
 
   const needleFuel = el.querySelector("#jauge-needle-fuel");
   const digitalSpeed = el.querySelector("#jauge-speed-digital");
+  const digitalFuel = el.querySelector("#jauge-fuel-digital");
 
   onValue(
     ref(mapsRtdb, "vehicle_status"),
@@ -148,6 +150,7 @@ export function create() {
       if (!data || typeof data.fuelPercent !== "number") return;
       const angle = valueToAngle(data.fuelPercent, 0, 100, FUEL_ANGLE_MIN, FUEL_ANGLE_MAX);
       needleFuel.setAttribute("transform", `rotate(${angle.toFixed(1)} ${FUEL_CX} ${FUEL_CY})`);
+      digitalFuel.textContent = `${Math.round(data.fuelPercent)}%`;
     },
     (err) => console.warn("[jauge] lecture essence impossible:", err.message)
   );
