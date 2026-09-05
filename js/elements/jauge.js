@@ -60,10 +60,15 @@ function buildStandaloneLabel({ cx, cy, r, angleMin, angleMax, min, max, value, 
   return `<text x="${pos.x.toFixed(1)}" y="${pos.y.toFixed(1)}" class="hud-jauge__label" style="font-size:${fontSize || 17}px">${text}</text>`;
 }
 
-function buildNeedle(id, cx, cy, len, tailLen, width, cls) {
+// initialAngle : orientation avant toute donnee reelle recue (evite qu'un
+// SVG "non tourne" pointe par coincidence sur une valeur qui n'est pas 0 -
+// c'etait le cas de la jauge essence, dessinee vers le haut = pile la
+// position du "½" vu l'echelle symetrique -100/+100).
+function buildNeedle(id, cx, cy, len, tailLen, width, cls, initialAngle) {
   const w = width || 3.5;
+  const transform = initialAngle ? ` transform="rotate(${initialAngle} ${cx} ${cy})"` : "";
   return `
-    <g id="${id}" class="${cls || "hud-jauge__needle-group"}">
+    <g id="${id}" class="${cls || "hud-jauge__needle-group"}"${transform}>
       <polygon points="${cx - w},${cy} ${cx - 1},${cy - len} ${cx + 1},${cy - len} ${cx + w},${cy}"/>
       <polygon points="${cx - w * 0.8},${cy} ${cx},${cy + tailLen} ${cx + w * 0.8},${cy}"/>
     </g>
@@ -107,7 +112,7 @@ export function create(elConfig) {
       ${buildTicks({ cx: FUEL_CX, cy: FUEL_CY, r: FUEL_R, angleMin: FUEL_ANGLE_MIN, angleMax: FUEL_ANGLE_MAX, min: 0, max: 100, step: FUEL_STEP, fontSize: 14, tickClass: "hud-jauge__tick--fuel", labels: [{ value: 0, text: "R" }, { value: 100, text: "F" }] })}
       ${buildStandaloneLabel({ cx: FUEL_CX, cy: FUEL_CY, r: FUEL_R, angleMin: FUEL_ANGLE_MIN, angleMax: FUEL_ANGLE_MAX, min: 0, max: 100, value: 50, text: "½", fontSize: 14 })}
       <text x="${FUEL_CX}" y="${FUEL_CY + 55}" id="jauge-fuel-digital" class="hud-jauge__unit hud-jauge__unit--fuel-value">0%</text>
-      ${buildNeedle("jauge-needle-fuel", FUEL_CX, FUEL_CY, FUEL_R - 26, 14, 3, "hud-jauge__needle-group hud-jauge__needle-group--fuel")}
+      ${buildNeedle("jauge-needle-fuel", FUEL_CX, FUEL_CY, FUEL_R - 26, 14, 3, "hud-jauge__needle-group hud-jauge__needle-group--fuel", FUEL_ANGLE_MIN)}
       <circle cx="${FUEL_CX}" cy="${FUEL_CY}" r="7" class="hud-jauge__cap hud-jauge__cap--fuel"/>
 
       <!-- Vitesse (droite, digital pur, aucun cadran/aiguille) -->
