@@ -2,6 +2,19 @@ import { collection, doc, getDocs, setDoc, deleteDoc, serverTimestamp } from "ht
 import { ref, uploadBytes, getDownloadURL, deleteObject } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
 import { db, storage } from "../../js/firebase-init.js?v=1";
 
+// Noms deja pris par d'autres commandes (chez Botsty78/posty78.fr ou dans
+// commandWebhook lui-meme) - une arme portant un de ces noms serait soit en
+// conflit cote bot, soit tout simplement inatteignable ici (les commandes
+// fixes ci-dessous sont verifiees avant le fallback "nom d'arme").
+const RESERVED_COMMANDS = new Set([
+  // Fournis par le pote (posty78.fr / Botsty78) - deja utilises la-bas.
+  "map", "clip", "bot", "site", "don", "maps", "vote", "track", "destination",
+  // Commandes fixes de commandWebhook - une arme portant un de ces noms
+  // ne serait jamais atteinte (les branches fixes passent avant le fallback arme).
+  "argent", "etoile", "censureon", "censureoff", "mapson", "mapsoff",
+  "overlayon", "overlayoff", "regis", "jauge", "essence",
+]);
+
 const weaponList = document.getElementById("weapon-list");
 const form = document.getElementById("weapon-upload-form");
 const commandInput = document.getElementById("weapon-command");
@@ -65,6 +78,11 @@ async function onSubmit(e) {
   const command = commandInput.value.trim().toLowerCase().replace(/^!/, "");
   const file = fileInput.files[0];
   if (!command || !file) return;
+
+  if (RESERVED_COMMANDS.has(command)) {
+    warningEl.textContent = `"!${command}" est déjà utilisée par une autre commande — choisis un autre nom, celle-ci ne serait jamais déclenchée.`;
+    return;
+  }
 
   if (knownCommands.has(command)) {
     const replace = confirm(`La commande "!${command}" a déjà une image. La remplacer ?`);

@@ -84,6 +84,16 @@ exports.commandWebhook = onRequest(
       return;
     }
 
+    // Liste des noms d'armes valides (Botsty78 s'en sert pour ne forwarder que les
+    // commandes reconnues, au lieu de tout envoyer en catch-all et se prendre des
+    // centaines de 404/jour sur les commandes TTS d'un autre bot). A mettre en
+    // cache quelques minutes cote bot, pas besoin de rappeler a chaque message.
+    if (req.query.list === "weapons") {
+      const snap = await db.collection("weapons").get();
+      res.json({ ok: true, weapons: snap.docs.map((d) => d.id) });
+      return;
+    }
+
     // Accents optionnels (ex: "etoile" et "étoile" doivent matcher tous les deux) -
     // normalise en NFD puis retire les diacritiques, meme technique que la
     // generation d'ID de scene cote admin (editor.js:onCreateScene).
@@ -109,11 +119,17 @@ exports.commandWebhook = onRequest(
           res.status(400).json({ ok: false, error: "invalid amount" });
           return;
         }
-        await stateRef.set(
-          { money: admin.firestore.FieldValue.increment(delta) },
-          { merge: true }
-        );
-        res.json({ ok: true, command, delta });
+        // Meme principe que les etoiles (clamp + retour du total) : borne a 8
+        // chiffres pour ne pas deborder l'affichage HUD (padStart(8) ne tronque
+        // jamais un nombre plus long, il debordait juste visuellement avant ca).
+        let nextMoney;
+        await db.runTransaction(async (tx) => {
+          const snap = await tx.get(stateRef);
+          const current = snap.data()?.money ?? 0;
+          nextMoney = Math.max(-99_999_999, Math.min(99_999_999, current + delta));
+          tx.set(stateRef, { money: nextMoney }, { merge: true });
+        });
+        res.json({ ok: true, command, delta, money: nextMoney });
         return;
       }
 
