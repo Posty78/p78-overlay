@@ -1,5 +1,5 @@
 import { initAuth } from "./auth.js?v=1";
-import { initEditor } from "./editor.js?v=15";
+import { initEditor } from "./editor.js?v=16";
 import { initWeapons } from "./weapons.js?v=1";
 import { initReset } from "./reset.js?v=1";
 import { initState } from "./state.js?v=1";

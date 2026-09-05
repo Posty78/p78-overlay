@@ -13,8 +13,8 @@ const FUEL_ANGLE_MIN = -100, FUEL_ANGLE_MAX = 100;
 // aucun de ces 10 traits, il est ajoute a part (buildStandaloneLabel).
 const FUEL_STEP = 100 / 9;
 
-const DIGITAL_CX = 420, DIGITAL_CY = 210;
-const DIGITAL_W = 260, DIGITAL_H = 200;
+const DIGITAL_CX = 440, DIGITAL_CY = 210;
+const DIGITAL_W = 300, DIGITAL_H = 230;
 
 function polarPoint(cx, cy, r, angleDeg) {
   const rad = (angleDeg * Math.PI) / 180;
@@ -75,7 +75,7 @@ function buildNeedle(id, cx, cy, len, tailLen, width, cls, initialAngle) {
   `;
 }
 
-const DEFAULT_W = 580, DEFAULT_H = 420;
+const DEFAULT_W = 620, DEFAULT_H = 420;
 
 // Recadrable comme les autres widgets (poignees haut-gauche/bas-droite + Alt-glisser) :
 // le SVG garde sa taille intrinseque fixe (voir .hud-jauge__svg plus bas, en px pas en %),
@@ -92,7 +92,7 @@ export function create(elConfig) {
   el.style.overflow = "hidden";
   applyConfig(el, elConfig);
   el.innerHTML = `
-    <svg viewBox="0 0 580 420" class="hud-jauge__svg">
+    <svg viewBox="0 0 620 420" class="hud-jauge__svg">
       <defs>
         <radialGradient id="jauge-face" cx="50%" cy="42%" r="70%">
           <stop offset="0%" stop-color="#232324"/>
@@ -117,11 +117,11 @@ export function create(elConfig) {
 
       <!-- Vitesse (droite, digital pur, aucun cadran/aiguille) -->
       <rect x="${DIGITAL_CX - DIGITAL_W / 2}" y="${DIGITAL_CY - DIGITAL_H / 2}" width="${DIGITAL_W}" height="${DIGITAL_H}" rx="16" class="hud-jauge__digital-panel"/>
-      <text x="${DIGITAL_CX}" y="${DIGITAL_CY - 10}" id="jauge-speed-digital" class="hud-jauge__digital">0</text>
-      <text x="${DIGITAL_CX}" y="${DIGITAL_CY + 55}" class="hud-jauge__unit hud-jauge__unit--digital">km/h</text>
+      <text x="${DIGITAL_CX}" y="${DIGITAL_CY - 15}" id="jauge-speed-digital" class="hud-jauge__digital">0</text>
+      <text x="${DIGITAL_CX}" y="${DIGITAL_CY + 65}" class="hud-jauge__unit hud-jauge__unit--digital">km/h</text>
     </svg>
     <style>
-      .hud-jauge__svg { width: 580px; height: 420px; overflow: visible; filter: drop-shadow(0 0 12px rgba(255,90,31,0.35)); }
+      .hud-jauge__svg { width: 620px; height: 420px; overflow: visible; filter: drop-shadow(0 0 12px rgba(255,90,31,0.35)); }
       .hud-jauge__bezel { fill: #050505; stroke: #2b2b2b; stroke-width: 3px; }
       .hud-jauge__digital-panel { fill: #050505; stroke: #ff5a1f; stroke-width: 3px; }
       .hud-jauge__tick { stroke: #ff5a1f; stroke-width: 2.5px; }
@@ -131,7 +131,7 @@ export function create(elConfig) {
         fill: #ff8a3d; text-anchor: middle; dominant-baseline: middle;
       }
       .hud-jauge__digital {
-        font-family: "Rajdhani", "Courier New", monospace; font-weight: 700; font-size: 100px;
+        font-family: "Rajdhani", "Courier New", monospace; font-weight: 700; font-size: 135px;
         fill: #ff8a3d; text-anchor: middle; dominant-baseline: middle;
         filter: drop-shadow(0 0 10px rgba(255,138,61,0.9));
       }
