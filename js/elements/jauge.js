@@ -4,7 +4,6 @@ import { mapsRtdb } from "../firebase-init.js?v=1";
 // Compteur vitesse seul (la jauge essence est desormais un widget separe,
 // "reservoir.js") : gros affichage numerique pur, aucun cadran/aiguille.
 const DIGITAL_CX = 150, DIGITAL_CY = 115;
-const DIGITAL_W = 300, DIGITAL_H = 230;
 const DEFAULT_W = 300, DEFAULT_H = 230;
 
 const DEMO_UP_MS = 4000, DEMO_HOLD_MS = 400, DEMO_DOWN_MS = 2000, DEMO_PAUSE_MS = 400;
@@ -62,13 +61,11 @@ export function create(elConfig) {
   el.style.overflow = "hidden";
   el.innerHTML = `
     <svg viewBox="0 0 300 230" class="hud-jauge__svg">
-      <rect x="${DIGITAL_CX - DIGITAL_W / 2}" y="${DIGITAL_CY - DIGITAL_H / 2}" width="${DIGITAL_W}" height="${DIGITAL_H}" rx="16" class="hud-jauge__digital-panel"/>
       <text x="${DIGITAL_CX}" y="${DIGITAL_CY - 15}" id="jauge-speed-digital" class="hud-jauge__digital">0</text>
       <text x="${DIGITAL_CX}" y="${DIGITAL_CY + 65}" class="hud-jauge__unit hud-jauge__unit--digital">km/h</text>
     </svg>
     <style>
       .hud-jauge__svg { width: 300px; height: 230px; overflow: visible; filter: drop-shadow(0 0 12px rgba(255,90,31,0.35)); }
-      .hud-jauge__digital-panel { fill: #050505; stroke: #ff5a1f; stroke-width: 3px; }
       .hud-jauge__digital {
         font-family: "Rajdhani", "Courier New", monospace; font-weight: 700; font-size: 135px;
         fill: #ff8a3d; text-anchor: middle; dominant-baseline: middle;
