@@ -2,7 +2,8 @@ import {
   collection, doc, getDocs, getDoc, setDoc, updateDoc, onSnapshot,
 } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
 import { ref, uploadBytes, getDownloadURL } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-storage.js";
-import { db, storage } from "../../js/firebase-init.js?v=1";
+import { db, storage, auth } from "../../js/firebase-init.js?v=1";
+import { FUNCTIONS_BASE_URL } from "../../js/config.js?v=1";
 import * as clock from "../../js/elements/clock.js?v=1";
 import * as battery from "../../js/elements/battery.js?v=1";
 import * as money from "../../js/elements/money.js?v=1";
@@ -12,7 +13,7 @@ import * as minimap from "../../js/elements/minimap.js?v=1";
 import * as iframe from "../../js/elements/iframe.js?v=2";
 import * as watermark from "../../js/elements/watermark.js?v=2";
 import * as weather from "../../js/elements/weather.js?v=1";
-import * as jauge from "../../js/elements/jauge.js?v=12";
+import * as jauge from "../../js/elements/jauge.js?v=13";
 import * as reservoir from "../../js/elements/reservoir.js?v=1";
 import * as roue from "../../js/elements/roue.js?v=1";
 import * as compteur from "../../js/elements/compteur.js?v=1";
@@ -36,7 +37,7 @@ const TYPE_LABELS = {
   iframe: "Widget externe (URL)",
   watermark: "Filigrane (PNG)",
   weather: "Météo (ville + temp)",
-  jauge: "Jauge (vitesse)",
+  jauge: "Compteur km/h",
   reservoir: "Réservoir (jauge essence)",
   roue: "Roue",
   compteur: "Compteur",
@@ -650,6 +651,56 @@ function renderElementList() {
         renderElementList();
       });
       details.appendChild(btnDemo);
+    }
+
+    // Demo purement visuelle (accelere 0->120 en boucle) - ne touche a aucune
+    // donnee reelle, meme mecanisme (el.demo) que les widgets proxy ci-dessus.
+    if (el.type === "jauge") {
+      const btnDemo = document.createElement("button");
+      btnDemo.textContent = el.demo ? "Démo : ON" : "Démo : OFF";
+      btnDemo.addEventListener("click", () => {
+        el.demo = !el.demo;
+        persistElements();
+        renderCanvas();
+        renderElementList();
+      });
+      details.appendChild(btnDemo);
+    }
+
+    // Test essence : passe par le vrai commandWebhook (donc le vrai chemin
+    // !jauge -> updateFuel -> Firestore posty78-maps), authentifie par le
+    // jeton Firebase de l'admin connecte plutot que par un secret partage -
+    // pas question de mettre un secret serveur-a-serveur dans le navigateur.
+    if (el.type === "reservoir") {
+      const testRow = document.createElement("div");
+      testRow.className = "detail-field";
+      const valueInput = document.createElement("input");
+      valueInput.type = "number";
+      valueInput.min = "1";
+      valueInput.max = "100";
+      valueInput.value = "99";
+      const btnTest = document.createElement("button");
+      btnTest.textContent = "Tester (!jauge)";
+      btnTest.addEventListener("click", async () => {
+        btnTest.disabled = true;
+        const original = btnTest.textContent;
+        try {
+          const token = await auth.currentUser.getIdToken();
+          const res = await fetch(`${FUNCTIONS_BASE_URL}/commandWebhook`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json", "Authorization": `Bearer ${token}` },
+            body: JSON.stringify({ command: "jauge", args: valueInput.value }),
+          });
+          const data = await res.json();
+          btnTest.textContent = data.ok ? "OK ✅" : `Erreur: ${data.error}`;
+        } catch (err) {
+          btnTest.textContent = `Erreur: ${err.message}`;
+        }
+        setTimeout(() => { btnTest.textContent = original; btnTest.disabled = false; }, 2000);
+      });
+      testRow.appendChild(valueInput);
+      testRow.appendChild(btnTest);
+      details.appendChild(testRow);
     }
 
     if (el.type === "battery") {

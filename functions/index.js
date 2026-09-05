@@ -35,6 +35,25 @@ const ADMIN_UIDS = [
 
 const STARS_MAX = 6;
 
+// commandWebhook accepte deux facons de s'authentifier : le secret partage
+// (Botsty78) OU un jeton Firebase d'un admin whitelistee (boutons de test du
+// panel admin, ex: "Tester (!jauge)" sur le widget Reservoir) - jamais de
+// secret serveur-a-serveur expose dans le navigateur.
+async function isAuthorizedCommand(req, commandSecretValue) {
+  const providedSecret = req.get("x-overlay-secret") || req.query.key;
+  if (safeEqual(providedSecret, commandSecretValue)) return true;
+
+  const authHeader = req.get("authorization") || "";
+  const token = authHeader.startsWith("Bearer ") ? authHeader.slice(7) : null;
+  if (!token) return false;
+  try {
+    const decoded = await admin.auth().verifyIdToken(token);
+    return ADMIN_UIDS.includes(decoded.uid);
+  } catch {
+    return false;
+  }
+}
+
 // Limiteur de debit simple (memoire du process, par IP) - reduit fortement
 // l'abus "un script qui boucle" sur les fonctions publiques sans auth
 // (weatherProxy, widgetProxy). Pas une protection absolue (n'importe qui avec
@@ -60,8 +79,7 @@ function isRateLimited(key, maxPerWindow) {
 exports.commandWebhook = onRequest(
   { region: "europe-west1", secrets: [COMMAND_SECRET, VEHICLE_SECRET], cors: true, maxInstances: 10 },
   async (req, res) => {
-    const providedSecret = req.get("x-overlay-secret") || req.query.key;
-    if (!safeEqual(providedSecret, COMMAND_SECRET.value())) {
+    if (!(await isAuthorizedCommand(req, COMMAND_SECRET.value()))) {
       res.status(403).json({ ok: false, error: "invalid secret" });
       return;
     }
