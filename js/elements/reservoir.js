@@ -8,7 +8,7 @@ import { mapsDb } from "../firebase-init.js?v=1";
 const FUEL_CX = 140, FUEL_CY = 140, FUEL_R = 110;
 const FUEL_ANGLE_MIN = -100, FUEL_ANGLE_MAX = 100;
 const FUEL_STEP = 100 / 9;
-const DEFAULT_W = 280, DEFAULT_H = 280;
+const DEFAULT_W = 280, DEFAULT_H = 320;
 
 function polarPoint(cx, cy, r, angleDeg) {
   const rad = (angleDeg * Math.PI) / 180;
@@ -78,7 +78,7 @@ export function create(elConfig) {
   el.style.overflow = "hidden";
   applyConfig(el, elConfig);
   el.innerHTML = `
-    <svg viewBox="0 0 280 280" class="hud-reservoir__svg">
+    <svg viewBox="0 0 280 320" class="hud-reservoir__svg">
       <defs>
         <radialGradient id="reservoir-face" cx="50%" cy="42%" r="70%">
           <stop offset="0%" stop-color="#232324"/>
@@ -99,9 +99,14 @@ export function create(elConfig) {
       <text x="${FUEL_CX}" y="${FUEL_CY + 55}" id="reservoir-digital" class="hud-reservoir__unit hud-reservoir__unit--value">0%</text>
       ${buildNeedle("reservoir-needle", FUEL_CX, FUEL_CY, FUEL_R - 26, 14, 3, FUEL_ANGLE_MIN)}
       <circle cx="${FUEL_CX}" cy="${FUEL_CY}" r="7" class="hud-reservoir__cap"/>
+      <text x="${FUEL_CX}" y="300" class="hud-reservoir__title">RÉSERVOIR</text>
     </svg>
     <style>
-      .hud-reservoir__svg { width: 280px; height: 280px; overflow: visible; filter: drop-shadow(0 0 12px rgba(255,90,31,0.35)); }
+      .hud-reservoir__svg { width: 280px; height: 320px; overflow: visible; filter: drop-shadow(0 0 12px rgba(255,90,31,0.35)); }
+      .hud-reservoir__title {
+        font-family: "Rajdhani", sans-serif; font-weight: 700; font-size: 20px; letter-spacing: 3px;
+        fill: #ff8a3d; text-anchor: middle; opacity: 0.9;
+      }
       .hud-reservoir__bezel { fill: #050505; stroke: #2b2b2b; stroke-width: 3px; }
       .hud-reservoir__tick { stroke: #e8e8e8; stroke-width: 2.5px; }
       .hud-reservoir__label {

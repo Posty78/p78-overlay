@@ -14,7 +14,7 @@ import * as iframe from "../../js/elements/iframe.js?v=2";
 import * as watermark from "../../js/elements/watermark.js?v=2";
 import * as weather from "../../js/elements/weather.js?v=1";
 import * as jauge from "../../js/elements/jauge.js?v=13";
-import * as reservoir from "../../js/elements/reservoir.js?v=1";
+import * as reservoir from "../../js/elements/reservoir.js?v=2";
 import * as roue from "../../js/elements/roue.js?v=1";
 import * as compteur from "../../js/elements/compteur.js?v=1";
 import * as defis from "../../js/elements/defis.js?v=1";
@@ -68,7 +68,7 @@ const DEFAULT_ELEMENTS = [
   { id: "weather", type: "weather", x: 90, y: 860, scale: 1, visible: true },
   { id: "watermark", type: "watermark", x: 830, y: 20, scale: 1, visible: true },
   { id: "jauge", type: "jauge", x: 1580, y: 780, scale: 1, visible: true, w: 300, h: 230 },
-  { id: "reservoir", type: "reservoir", x: 1280, y: 760, scale: 1, visible: true, w: 280, h: 280 },
+  { id: "reservoir", type: "reservoir", x: 1280, y: 760, scale: 1, visible: true, w: 280, h: 320 },
 ];
 
 const stage = document.getElementById("canvas-stage");
@@ -458,7 +458,7 @@ function wireResize(wrapper, handle, id, corner = "br") {
     startClientY = e.clientY;
     const el = currentElements.find((c) => c.id === id);
     startScale = el.scale ?? 1;
-    const cropDefaults = { watermark: [260, 100], jauge: [300, 230], reservoir: [280, 280] };
+    const cropDefaults = { watermark: [260, 100], jauge: [300, 230], reservoir: [280, 320] };
     const [defaultW, defaultH] = cropDefaults[el.type] || [400, 300];
     startW = el.w ?? defaultW;
     startH = el.h ?? defaultH;
