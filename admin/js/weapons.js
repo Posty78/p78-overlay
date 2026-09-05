@@ -13,7 +13,7 @@ let knownCommands = new Set();
 export async function initWeapons() {
   await refreshWeaponList();
   form.addEventListener("submit", onSubmit);
-  document.getElementById("btn-weapon-clear").addEventListener("click", () => onShowManually(null));
+  document.getElementById("btn-weapon-clear").addEventListener("click", () => onShowManually("poing", null));
 }
 
 async function refreshWeaponList() {
@@ -39,7 +39,7 @@ async function refreshWeaponList() {
     const btnShow = document.createElement("button");
     btnShow.textContent = "Afficher";
     btnShow.className = "primary";
-    btnShow.addEventListener("click", () => onShowManually(data.imageUrl));
+    btnShow.addEventListener("click", () => onShowManually(docSnap.id, data.imageUrl));
     row.appendChild(btnShow);
 
     const btnDelete = document.createElement("button");
@@ -92,10 +92,19 @@ async function onSubmit(e) {
   await refreshWeaponList();
 }
 
-async function onShowManually(imageUrl) {
+// Reproduit ici le meme comportement que commandWebhook pour !volant / autre
+// arme (voir functions/index.js), pour que le bouton "Afficher" de l'admin se
+// comporte comme la vraie commande chat qu'il simule - sinon le test dans le
+// panel donnait un resultat different du vrai !trepied/!bidon/etc.
+async function onShowManually(command, imageUrl) {
   await setDoc(
     doc(db, "state", "gta"),
     { weaponImageUrl: imageUrl, weaponUpdatedAt: serverTimestamp() },
+    { merge: true }
+  );
+  await setDoc(
+    doc(db, "state", "widgets"),
+    { mapsHidden: command !== "volant", updatedAt: serverTimestamp() },
     { merge: true }
   );
 }
