@@ -1,4 +1,5 @@
 const { onRequest } = require("firebase-functions/v2/https");
+const { onSchedule } = require("firebase-functions/v2/scheduler");
 const { defineSecret } = require("firebase-functions/params");
 const admin = require("firebase-admin");
 const crypto = require("crypto");
@@ -79,6 +80,15 @@ function isRateLimited(key, maxPerWindow) {
 exports.commandWebhook = onRequest(
   { region: "europe-west1", secrets: [COMMAND_SECRET, VEHICLE_SECRET], cors: true, maxInstances: 10 },
   async (req, res) => {
+    // Ping de maintien au chaud (voir keepCommandWebhookWarm ci-dessous) : aucun
+    // effet, aucune authentification requise - juste un aller-retour pour eviter
+    // que l'instance ne s'eteigne completement, sans payer minInstances. Priorite
+    // absolue sur tout le reste, avant meme la verification du secret.
+    if (req.query.ping === "1") {
+      res.json({ ok: true, pong: true });
+      return;
+    }
+
     if (!(await isAuthorizedCommand(req, COMMAND_SECRET.value()))) {
       res.status(403).json({ ok: false, error: "invalid secret", error_code: "invalid_secret" });
       return;
@@ -451,3 +461,17 @@ exports.resetState = onRequest({ region: "europe-west1", cors: true, maxInstance
     res.status(401).json({ ok: false, error: "invalid token" });
   }
 });
+
+// Maintien au chaud de commandWebhook (alternative gratuite a minInstances,
+// proposee par le pote Botsty78 pour la latence de !censureon) : ping toutes
+// les 4 min, sous le seuil d'inactivite auquel Cloud Run eteint l'instance -
+// coute une invocation de fonction planifiee toutes les 4 min (~10 800/mois,
+// tres loin des 2M gratuits) au lieu d'une instance payante 24/7.
+const COMMAND_WEBHOOK_URL = "https://europe-west1-posty78-overlay.cloudfunctions.net/commandWebhook";
+
+exports.keepCommandWebhookWarm = onSchedule(
+  { schedule: "every 4 minutes", region: "europe-west1" },
+  async () => {
+    await fetch(`${COMMAND_WEBHOOK_URL}?ping=1`).catch(() => {});
+  }
+);
