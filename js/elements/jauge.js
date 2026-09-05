@@ -70,9 +70,22 @@ function buildNeedle(id, cx, cy, len, tailLen, width, cls) {
   `;
 }
 
-export function create() {
+const DEFAULT_W = 580, DEFAULT_H = 420;
+
+// Recadrable comme les autres widgets (poignees haut-gauche/bas-droite + Alt-glisser) :
+// le SVG garde sa taille intrinseque fixe (voir .hud-jauge__svg plus bas, en px pas en %),
+// c'est le conteneur qui se redimensionne avec overflow:hidden - agrandir/reduire ce
+// conteneur revele/masque une partie du cadran au lieu de le mettre a l'echelle.
+export function applyConfig(el, elConfig) {
+  el.style.width = `${elConfig?.w ?? DEFAULT_W}px`;
+  el.style.height = `${elConfig?.h ?? DEFAULT_H}px`;
+}
+
+export function create(elConfig) {
   const el = document.createElement("div");
   el.className = "hud-jauge";
+  el.style.overflow = "hidden";
+  applyConfig(el, elConfig);
   el.innerHTML = `
     <svg viewBox="0 0 580 420" class="hud-jauge__svg">
       <defs>

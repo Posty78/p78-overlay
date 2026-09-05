@@ -12,7 +12,7 @@ import * as minimap from "../../js/elements/minimap.js?v=1";
 import * as iframe from "../../js/elements/iframe.js?v=2";
 import * as watermark from "../../js/elements/watermark.js?v=2";
 import * as weather from "../../js/elements/weather.js?v=1";
-import * as jauge from "../../js/elements/jauge.js?v=8";
+import * as jauge from "../../js/elements/jauge.js?v=9";
 import * as roue from "../../js/elements/roue.js?v=1";
 import * as compteur from "../../js/elements/compteur.js?v=1";
 import * as defis from "../../js/elements/defis.js?v=1";
@@ -48,7 +48,7 @@ const MULTI_INSTANCE_TYPES = new Set(["iframe", "battery"]);
 // Types avec une vraie largeur/hauteur configurable (donc "recadrables", au sens
 // OBS du terme) plutot qu'un simple zoom uniforme via l'echelle.
 const CROPPABLE_TYPES = new Set([
-  "iframe", "watermark", "roue", "compteur", "defis", "dons", "subgoal", "giveaway", "sondage",
+  "iframe", "watermark", "roue", "compteur", "defis", "dons", "subgoal", "giveaway", "sondage", "jauge",
 ]);
 // Widgets externes "natifs" (URL fixee en dur) - ont un bouton Demo comme le
 // type iframe generique, mais bascule un simple booleen elConfig.demo au lieu
@@ -64,7 +64,7 @@ const DEFAULT_ELEMENTS = [
   { id: "minimap", type: "minimap", x: 40, y: 720, scale: 1, visible: true },
   { id: "weather", type: "weather", x: 90, y: 860, scale: 1, visible: true },
   { id: "watermark", type: "watermark", x: 830, y: 20, scale: 1, visible: true },
-  { id: "jauge", type: "jauge", x: 1440, y: 780, scale: 1, visible: true },
+  { id: "jauge", type: "jauge", x: 1440, y: 780, scale: 1, visible: true, w: 580, h: 420 },
 ];
 
 const stage = document.getElementById("canvas-stage");
@@ -454,8 +454,10 @@ function wireResize(wrapper, handle, id, corner = "br") {
     startClientY = e.clientY;
     const el = currentElements.find((c) => c.id === id);
     startScale = el.scale ?? 1;
-    startW = el.w ?? (el.type === "watermark" ? 260 : 400);
-    startH = el.h ?? (el.type === "watermark" ? 100 : 300);
+    const cropDefaults = { watermark: [260, 100], jauge: [580, 420] };
+    const [defaultW, defaultH] = cropDefaults[el.type] || [400, 300];
+    startW = el.w ?? defaultW;
+    startH = el.h ?? defaultH;
     startX = el.x;
     startY = el.y;
   });
