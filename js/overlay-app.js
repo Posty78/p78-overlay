@@ -9,7 +9,8 @@ import * as minimap from "./elements/minimap.js?v=1";
 import * as iframe from "./elements/iframe.js?v=2";
 import * as watermark from "./elements/watermark.js?v=2";
 import * as weather from "./elements/weather.js?v=1";
-import * as jauge from "./elements/jauge.js?v=11";
+import * as jauge from "./elements/jauge.js?v=12";
+import * as reservoir from "./elements/reservoir.js?v=1";
 import * as roue from "./elements/roue.js?v=1";
 import * as compteur from "./elements/compteur.js?v=1";
 import * as defis from "./elements/defis.js?v=1";
@@ -20,7 +21,7 @@ import * as sondage from "./elements/sondage.js?v=1";
 import { mountCensure } from "./elements/censure.js?v=1";
 
 const ELEMENTS = {
-  clock, battery, money, stars, weapon, minimap, iframe, watermark, weather, jauge,
+  clock, battery, money, stars, weapon, minimap, iframe, watermark, weather, jauge, reservoir,
   roue, compteur, defis, dons, subgoal, giveaway, sondage,
 };
 
