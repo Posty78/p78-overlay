@@ -80,7 +80,7 @@ exports.commandWebhook = onRequest(
   { region: "europe-west1", secrets: [COMMAND_SECRET, VEHICLE_SECRET], cors: true, maxInstances: 10 },
   async (req, res) => {
     if (!(await isAuthorizedCommand(req, COMMAND_SECRET.value()))) {
-      res.status(403).json({ ok: false, error: "invalid secret" });
+      res.status(403).json({ ok: false, error: "invalid secret", error_code: "invalid_secret" });
       return;
     }
 
@@ -106,7 +106,7 @@ exports.commandWebhook = onRequest(
     const args = payload?.args;
 
     if (!command) {
-      res.status(400).json({ ok: false, error: "missing command" });
+      res.status(400).json({ ok: false, error: "missing command", error_code: "missing_command" });
       return;
     }
 
@@ -116,7 +116,7 @@ exports.commandWebhook = onRequest(
       if (command === "argent") {
         const delta = parseInt(args, 10);
         if (Number.isNaN(delta)) {
-          res.status(400).json({ ok: false, error: "invalid amount" });
+          res.status(400).json({ ok: false, error: "invalid amount", error_code: "invalid_amount" });
           return;
         }
         // Meme principe que les etoiles (clamp + retour du total) : borne a 8
@@ -229,12 +229,18 @@ exports.commandWebhook = onRequest(
           });
           const data = await upstream.json();
           if (!upstream.ok || !data.ok) {
-            res.status(upstream.status || 500).json({ ok: false, error: data.error || "echec mise a jour essence" });
+            // Fait suivre le error_code d'updateFuel si present (invalid_value,
+            // invalid_liters, invalid_mode), sinon code generique.
+            res.status(upstream.status || 500).json({
+              ok: false,
+              error: data.error || "echec mise a jour essence",
+              error_code: data.error_code || "vehicle_update_failed",
+            });
             return;
           }
           res.json({ ok: true, command, fuelPercent: data.fuelPercent });
         } catch (err) {
-          res.status(502).json({ ok: false, error: err.message });
+          res.status(502).json({ ok: false, error: err.message, error_code: "vehicle_unreachable" });
         }
         return;
       }
@@ -242,7 +248,7 @@ exports.commandWebhook = onRequest(
       // Sinon : la commande est un nom d'arme mappé dans la collection "weapons" via le panel admin.
       const weaponSnap = await db.collection("weapons").doc(command).get();
       if (!weaponSnap.exists) {
-        res.status(404).json({ ok: false, error: `commande inconnue: ${command}` });
+        res.status(404).json({ ok: false, error: `commande inconnue: ${command}`, error_code: "unknown_command" });
         return;
       }
       await stateRef.set(
@@ -267,7 +273,7 @@ exports.commandWebhook = onRequest(
 
       res.json({ ok: true, command });
     } catch (err) {
-      res.status(500).json({ ok: false, error: err.message });
+      res.status(500).json({ ok: false, error: err.message, error_code: "internal_error" });
     }
   }
 );
