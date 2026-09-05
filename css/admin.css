@@ -190,6 +190,7 @@ section.panel {
 .panel--weapons  { --accent: #f97316; }
 .panel--censure  { --accent: #ef4444; }
 .panel--widgets  { --accent: #06b6d4; }
+.panel--testchat { --accent: #a855f7; }
 
 section.panel h2 {
   display: flex;
@@ -233,6 +234,26 @@ section.panel h2:hover::after { background: var(--accent); }
 section.panel.is-collapsed h2 { margin-bottom: 0; border-bottom: none; }
 section.panel.is-collapsed h2::after { transform: rotate(-90deg); }
 section.panel.is-collapsed > :not(h2) { display: none; }
+
+/* --- Chat de test (simule Botsty78) --- */
+#testchat-log {
+  max-height: 220px;
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  margin-bottom: 8px;
+  padding: 8px;
+  background: #0d0e11;
+  border: 1px solid #23262d;
+  border-radius: 8px;
+  font-size: 12.5px;
+}
+.testchat-msg { padding: 3px 6px; border-radius: 5px; word-break: break-word; }
+.testchat-msg--user { background: #1c2530; color: #cfe0f5; }
+.testchat-msg--ok { background: #10241a; color: #7be3a6; }
+.testchat-msg--error { background: #2a1414; color: #f5a3a3; }
+#testchat-commands { line-height: 1.6; }
 
 /* --- Lignes d'élément --- */
 .element-row {

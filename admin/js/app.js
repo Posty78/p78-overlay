@@ -5,6 +5,7 @@ import { initReset } from "./reset.js?v=1";
 import { initState } from "./state.js?v=1";
 import { initCensure } from "./censure.js?v=1";
 import { initWidgets } from "./widgets.js?v=1";
+import { initTestChat } from "./testchat.js?v=1";
 import { initAccordion } from "./accordion.js?v=1";
 
 initAccordion();
@@ -20,4 +21,5 @@ initAuth(() => {
   initState();
   initCensure();
   initWidgets();
+  initTestChat();
 });
